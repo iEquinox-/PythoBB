@@ -26,7 +26,7 @@ class Django:
 
 	def Install(self):
 		self.modules[0].system(
-			"sudo apt-get install python-pip" #Assumes APT-GET method
+			"apt-get install python-pip" #Assumes APT-GET method
 			)
 		self.modules[0].system(
 			"pip install Django==" + self.djver
