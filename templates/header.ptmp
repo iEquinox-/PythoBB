@@ -1,0 +1,20 @@
+<head>
+	<title>{[forumtitle]}</title>
+	<style>
+		body {
+			background: #111;
+			margin: 0;
+		}
+
+		div.t {
+			background: #EE3535;
+			padding: 20px;
+			font-family:tohama, droid sans, sans-serif;
+			color: #FFF;
+			margin: 50px auto;
+			width: 25%;
+			text-align: center;
+			border-raduis: 3px;
+		}
+	</style>
+</head>
