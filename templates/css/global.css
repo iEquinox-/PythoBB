@@ -117,8 +117,3 @@ div#minicontainer > form.loginmethod > input.fieldtext {
 	font-family: tohama,droid sans,sans-serif;
 	color: #000;
 }
-
-div#minicontainer > form.loginmethod > input.fieldtext.r {
-	float: right;
-}
-}
