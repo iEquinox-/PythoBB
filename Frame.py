@@ -90,31 +90,33 @@ class Pages:
 	def __init__(self):
 		from django.http import HttpResponse
 		self.resp = HttpResponse
-		self.temp = {"Index":self.getTemplate("header")+"<body><div class='title'>Welcome to PythoBB.</div></body>"}
 			
-	def getTemplate(self, x, vars=None):
+	def getTemplate(self, x, vars=None, t=None):
 		import re,json
 		f = {
 			"forumtitle":"PythoBB",
 			"forumurl":"http://127.0.0.1:8000/"
 			}
-		if vars != None:
-			f = {
-				"forumtitle":"PythoBB",
-				"forumurl":"http://127.0.0.1:8000/",
+		if(vars != None)and(t=="user"):
+			u = {
 				"avatar":"<img src='%s'/ class='profava'>" % (vars["avatar"]),
-				"username":vars["username"]
+				"username":vars["username"],
+				"group":vars["group"],
+				"uid":vars["uid"]
 				}
+		else:
+			u = dict()
 		y = open(Main().dir + "templates/%s.ptmp" % (x),"r").read()
 		for c in re.findall("\{\[(.*?)\]\}",y):
-			y = y.replace("{[%s]}"%(c),f[c])
+			for q in [f,u]:
+				try: y = y.replace("{[%s]}"%(c),q[c])
+				except: pass
 		return y
 
 	def Index(self, request):
-		return self.resp(self.temp["Index"])
+		return self.resp(self.getTemplate("header")+self.getTemplate("index"))
 
 	def Profile(self, request, username):
 		f = User().viewuser(username)
-		# f["username"]+" "+f["registered"]+" "+f["group"]+" "+f["uid"]
-		page = self.getTemplate("header")+self.getTemplate("profile",vars=f)
+		page = self.getTemplate("header")+self.getTemplate("profile",vars=f,t="user")
 		return self.resp(page)
