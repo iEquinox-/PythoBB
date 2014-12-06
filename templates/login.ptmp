@@ -1,0 +1,8 @@
+	{[getCSRF]}
+	<div class='title login'>Login</div>
+	<div id='minicontainer'>
+		<form action='.' method='post' class='loginmethod'>
+			{[csrfToken]}
+			<input type='text' name='username' maxlength='25'/>
+		</form>
+	</div>
