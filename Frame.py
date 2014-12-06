@@ -99,7 +99,9 @@ class Pages:
 		import re,json,time
 		f = {
 			"forumtitle":"PythoBB",
-			"forumurl":"http://127.0.0.1:8000/"
+			"forumurl":"http://127.0.0.1:8000/",
+			"csrfToken":"""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""",
+			"getCSRF":"<script>"+open(Main().dir + "templates/js/getCSRF.js","r").read()+"</script>"
 			}
 		if(vars != None)and(t=="user"):
 			u = {
@@ -128,3 +130,10 @@ class Pages:
 		else:
 			page = self.getTemplate("header")+self.getTemplate("profile",vars=f,t="user")+self.getTemplate("footer")
 		return self.resp(page)
+
+	def Login(self, request):
+		struct = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("login"),self.getTemplate("footer"))
+		return self.resp(struct)
+		
+	def doLogin(self, request):
+		return self.resp(request.POST["username"])
