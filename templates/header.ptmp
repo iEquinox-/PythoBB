@@ -2,19 +2,53 @@
 	<title>{[forumtitle]}</title>
 	<style>
 		body {
-			background: #111;
+			background: #222;
 			margin: 0;
 		}
-
-		div.t {
-			background: #EE3535;
+		
+		div#container {
+			width: 80%;
+			background: #333;
+			margin: auto;
 			padding: 20px;
-			font-family:tohama, droid sans, sans-serif;
-			color: #FFF;
-			margin: 50px auto;
+		}
+		
+		div#cont {
 			width: 25%;
+			background: #444;
+			margin: 25px auto;
+			padding: 20px;
+			height: 100px;
+			line-height: 100px;
+			border-radius: 3px;
+			box-shadow: 0 0 15px #000;
+		}
+		
+		div#cont > img.profava {
+			position: absolute;
+			border-radius: 50%;
+			height: 100px;
+			width: 100px;
+		}
+		
+		div#cont > div#username {
+			margin-left: 125px;
+			background: #F5F5F5;
+			color: #111;
+			font-family:tohama,droid sans,sans-serif;
+			padding: 0 10px;
 			text-align: center;
-			border-raduis: 3px;
+			border: 1px solid #111;
+			border-left: 0;
+		}
+		
+		div#cont > div#username:before {
+			content: ' ';
+			position: absolute;
+			border-top: 50px solid transparent;
+			border-bottom: 50px solid transparent;
+			border-right: 41px solid #F5F5F5;
+			margin-left: -120px;
 		}
 	</style>
 </head>
