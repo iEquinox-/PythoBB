@@ -1,0 +1,3 @@
+	<div id='bottomblock'>
+		{[whosonline_users]} User{[s]} online
+	</div>
