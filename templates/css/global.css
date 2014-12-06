@@ -14,7 +14,6 @@ a:active {
 div#header {
 	background: #2ecc71;
 	padding: 20px;
-	border-bottom: 4px solid #27ae60;
 	font-family:'Raleway',sans-serif;
 	color: #FFF!important;
 	font-size: 45px;
@@ -85,9 +84,6 @@ span.stat {
 div#footer {
 	padding: 20px;
 	background: #2ecc71;
-	border:4px solid #27ae60;
-	border-left: none;
-	border-right: none;
 	color: #FFF;
 	font-family:'Raleway',sans-serif;
 	font-size: 20px;
