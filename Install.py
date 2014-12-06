@@ -59,6 +59,9 @@ def insertAdmin():
 	p = hashlib.md5(p+sa).hexdigest()
 	s = sqlite3.connect(json.loads(sl["host"]))
 	s.cursor().execute("INSERT INTO pythobb_users VALUES ('{0}','{1}','{2}','{3}','','{4}','admin','1','0')".format(u,p,sa,e,int(time.time())))
+	re = salt()
+	s.cursor().execute("INSERT INTO pythobb_sessions VALUES ('{0}','1')".format(hashlib.md5(re+salt()).hexdigest()))
+	s.commit()
 	
 if __name__ == "__main__":
 	print "If you haven't aleady installed Django, pip, and PythoBB, please login to root before running this script."
