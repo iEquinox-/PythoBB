@@ -1,6 +1,8 @@
-<div id="prof">
-	<div id='cont'>
-		{[avatar]}
-		<div id='username'>{[username]}</div>
+	<div id="prof">
+		<div id='cont'>
+			{[avatar]}
+			<div id='inf'>{[username]}</div>
+			<div id='inf' style="margin-top:-80px;">{[group]}</div>
+			<div id='inf' style="margin-top:-45px;">UID: {[uid]}</div>
+		</div>
 	</div>
-</div>
