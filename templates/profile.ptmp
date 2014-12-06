@@ -1,0 +1,6 @@
+<div id="prof">
+	<div id='cont'>
+		{[avatar]}
+		<div id='username'>{[username]}</div>
+	</div>
+</div>
