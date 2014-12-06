@@ -23,7 +23,7 @@ div#container {
 	width: 75%;
 	background: #444;
 	padding: 20px;
-	margin: 25px auto;
+	margin: 0 auto 25px;
 }
 		
 div#container.error {
@@ -118,4 +118,11 @@ div#minicontainer > form.loginmethod > input.fieldtext {
 	width: 200px;
 	font-family: tohama,droid sans,sans-serif;
 	color: #000;
+}
+
+div#userblock {
+	margin: 25px auto 0;
+	width: 75%;
+	padding: 20px;
+	background: #2ecc71;
 }
