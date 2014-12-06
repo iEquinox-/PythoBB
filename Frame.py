@@ -101,7 +101,7 @@ class Pages:
 			"forumtitle":"PythoBB",
 			"forumurl":"http://127.0.0.1:8000/",
 			"csrfToken":"""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""",
-			"getCSRF":"<script>"+open(Main().dir + "templates/js/getCSRF.js","r").read()+"</script>"
+			"getCSRF":"<script>"+open(Main().dir + "templates/js/function.js","r").read()+"</script>"
 			}
 		if(vars != None)and(t=="user"):
 			u = {
