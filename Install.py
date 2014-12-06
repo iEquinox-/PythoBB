@@ -70,6 +70,7 @@ if __name__ == "__main__":
 	s = raw_input("Have you installed Django, pip, and PythoBB? [y/n]")
 	if s == "n":
 		print getFiles()
+		sl["dir"] = json.dumps(dir)
 		print doQueries()
 		writeSettings()
 		insertAdmin()
@@ -77,6 +78,7 @@ if __name__ == "__main__":
 		sl["pythobb"] = json.dumps(True)
 		sl["pip"] = json.dumps(True)
 		sl["django"] = json.dumps(True)
+		sl["dir"] = json.dumps(dir)
 		print doQueries()
 		writeSettings()
 		insertAdmin()
