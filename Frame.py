@@ -161,8 +161,13 @@ class Pages:
 	def getOnline(self,v=False):
 		if not v:
 			s1 = self.getOnline(v=True)
-			if s1 > 1: s2 = "s"
-			else: s2 = ""
+			if s1 > 1:
+				s2 = "s"
+			else:
+				if s1 == 0:
+					s2 = "s"
+				else:
+					s2 = ""
 			s1 = str(s1)
 			s = str(open(Main().dir+"templates/whosonline.ptmp","r").read()).replace("{[whosonline_users]}",s1).replace("{[s]}",s2)
 			return s
