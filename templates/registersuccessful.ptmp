@@ -1,0 +1,5 @@
+	<div class='title login'>Registration successful.</div>
+	<div id='minicontainer'>
+		<span>You will now be redirected.</span>
+	</div>
+	{[respawn]}
