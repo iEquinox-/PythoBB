@@ -125,4 +125,7 @@ div#userblock {
 	width: 75%;
 	padding: 20px;
 	background: #2ecc71;
+	border-radius: 3px 3px 0 0;
 }
+div#userblock > ul {padding:0;margin:0;}
+div#userblock > ul > li {display:inline;}
