@@ -1,0 +1,5 @@
+	<div class='title login'>Logout</div>
+	<div id='minicontainer'>
+		Successfully logged out. You will now be redirected.
+	</div>
+	{[respawn]}
