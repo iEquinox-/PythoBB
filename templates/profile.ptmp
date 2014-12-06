@@ -1,10 +1,13 @@
-	<div id='prof'>
-		<div id='cont' class='profile'>
-			{[avatar]}
-			<div id='inf'>{[username]}</div>
-			<div id='inf' style="margin-top:-80px;">{[group]}</div>
-			<div id='inf' style="margin-top:-45px;">UID: {[uid]}</div>
-			<br/><div class='hr'></div><br/>
-			<span class='stat'>Registered {[registered]}</span>
+	{[userblock]}
+	<div id='container'>
+		<div id='prof'>
+			<div id='cont' class='profile'>
+				{[avatar]}
+				<div id='inf'>{[username]}</div>
+				<div id='inf' style="margin-top:-80px;">{[group]}</div>
+				<div id='inf' style="margin-top:-45px;">UID: {[uid]}</div>
+				<br/><div class='hr'></div><br/>
+				<span class='stat'>Registered {[registered]}</span>
+			</div>
 		</div>
 	</div>
