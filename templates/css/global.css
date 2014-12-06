@@ -23,7 +23,7 @@ div#container {
 	width: 75%;
 	background: #444;
 	padding: 20px;
-	margin: 0 auto 25px;
+	margin: 0 auto;
 }
 		
 div#container.error {
