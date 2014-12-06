@@ -1,16 +1,41 @@
 <head>
 	<title>{[forumtitle]}</title>
+	<link href='http://fonts.googleapis.com/css?family=Raleway:100' rel='stylesheet' type='text/css'>
 	<style>
 		body {
 			background: #222;
 			margin: 0;
 		}
 		
-		div#container {
-			width: 80%;
-			background: #333;
-			margin: auto;
+		a:link,
+		a:hover,
+		a:visited,
+		a:active {
+			color: #FFF!important;
+			text-decoration: none;
+		}
+		
+		div#header {
+			background: #2ecc71;
 			padding: 20px;
+			border-bottom: 4px solid #27ae60;
+			font-family:'Raleway',sans-serif;
+			color: #FFF!important;
+			font-size: 45px;
+		}
+		
+		div#container {
+			width: 75%;
+			background: #444;
+			padding: 20px;
+			margin: 25px auto;
+		}
+		
+		div#container.error {
+			font-family:'Raleway',sans-serif;
+			text-align: center;
+			color: #FFF;
+			font-size: 35px;
 		}
 		
 		div#cont {
@@ -22,33 +47,40 @@
 			line-height: 100px;
 			border-radius: 3px;
 			box-shadow: 0 0 15px #000;
+			text-align: center;
 		}
 		
 		div#cont > img.profava {
-			position: absolute;
 			border-radius: 50%;
 			height: 100px;
 			width: 100px;
 		}
 		
-		div#cont > div#username {
-			margin-left: 125px;
-			background: #F5F5F5;
-			color: #111;
-			font-family:tohama,droid sans,sans-serif;
+		div#cont > div#inf {
+			background: #555;
+			color: #FFF;
+			font-family: tohama,droid sans,sans-serif;
 			padding: 0 10px;
 			text-align: center;
-			border: 1px solid #111;
-			border-left: 0;
+			position: absolute;
+			margin-left: -40px;
+			line-height: 30px;
+			height: 30px;
+			margin-top: -115px;
+			text-transform: capitalize;
 		}
 		
-		div#cont > div#username:before {
+		div#cont > div#inf:before {
 			content: ' ';
 			position: absolute;
-			border-top: 50px solid transparent;
-			border-bottom: 50px solid transparent;
-			border-right: 41px solid #F5F5F5;
-			margin-left: -120px;
+			border-bottom: 10px solid transparent;
+			border-right: 20px solid #333;
+			margin-top: 30px;
+			margin-left: -10px;
 		}
 	</style>
 </head>
+<body>
+	<div id='header'>
+		<a href='{[forumurl]}'>{[forumtitle]}</a>
+	</div>
