@@ -128,4 +128,4 @@ div#userblock {
 	border-radius: 3px 3px 0 0;
 }
 div#userblock > ul {padding:0;margin:0;}
-div#userblock > ul > li {display:inline;}
+div#userblock > ul > li {display:inline;font-family:tohama,droid sans,sans-serif;margin:0 10px;}
