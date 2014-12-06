@@ -107,3 +107,14 @@ div#minicontainer {
 	color: #FFF;
 	border-radius: 0 0 3px 3px;
 }
+
+div#minicontainer > form.loginmethod > input.fieldtext {
+	background: #DDD;
+	padding: 10px;
+	margin: 2px 0;
+	border: 1px solid #DDD;
+	width: 200px;
+	font-family: tohama,droid sans,sans-serif;
+	color: #000;
+}
+}
