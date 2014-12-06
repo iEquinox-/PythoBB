@@ -32,10 +32,10 @@ class User:
 	def authorize(self, inp):
 		import hashlib
 		x = Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(inp[0]),s=False)
-		uid = [c for c in x][0][-1]
+		uid = [c for c in x][0][-2]
 		if len([c for c in x]) == 0:
 			nx = Main().execute(q="SELECT * FROM pythobb_users WHERE email='%s'"%(inp[0]),s=False)
-			uid = [c for c in x][0][-1]
+			uid = [c for c in x][0][-2]
 			if len([c for c in nx]) == 0:
 				return ["Invalid username/email."]
 			else:
@@ -67,7 +67,7 @@ class User:
 					avatar = "http://i.imgur.com/JahN5AL.png"
 				else:
 					avatar = d[0][4]
-				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-1],"avatar":avatar}
+				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-2],"avatar":avatar}
 		except Exception as e:
 			return str("".join(e))
 
@@ -138,7 +138,8 @@ class Pages:
 			"csrfToken":"""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""",
 			"getCSRF":"<script>"+open(Main().dir + "templates/js/getCSRF.js","r").read()+"doCSRF();</script>",
 			"userblock":self.Userblock(auth[0],auth[1]),
-			"respawn":"<script>setTimeout(function(){location.href='%s';},200);</script>" % (Main().url)
+			"respawn":"<script>setTimeout(function(){location.href='%s';},200);</script>" % (Main().url),
+			"whosonline":self.getOnline(v=False)
 			}
 		if(vars != None)and(t=="user"):
 			u = {
@@ -156,6 +157,18 @@ class Pages:
 				try: y = y.replace("{[%s]}"%(c),q[c])
 				except: pass
 		return y
+		
+	def getOnline(self,v=False):
+		if not v:
+			s1 = self.getOnline(v=True)
+			if s1 > 1: s2 = "s"
+			else: s2 = ""
+			s1 = str(s1)
+			s = str(open(Main().dir+"templates/whosonline.ptmp","r").read()).replace("{[whosonline_users]}",s1).replace("{[s]}",s2)
+			return s
+		else:
+			c = [x for x in Main().execute(q="SELECT * FROM pythobb_users WHERE loggedin='1'",s=False)]
+			return len(c)
 		
 	def Userblock(self, a1, a2):
 		if a1 == True:
@@ -176,6 +189,8 @@ class Pages:
 				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
 			else:
 				uid = None
+		else:
+			uid = None
 		if uid:
 			return self.resp(self.getTemplate("header")+self.getTemplate("index",auth=[True,uid])+self.getTemplate("footer"))
 		else:
@@ -189,6 +204,8 @@ class Pages:
 				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
 			else:
 				uid = None
+		else:
+			uid = None
 		if uid:
 			if f == False:
 				page = self.getTemplate("header")+self.getTemplate("404",auth=[True,uid])+self.getTemplate("footer")
@@ -209,6 +226,8 @@ class Pages:
 				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
 			else:
 				uid = None
+		else:
+			uid = None
 		if uid:
 			struct = "<script>location.href='%s';</script>"%(Main().url)
 		else:
@@ -222,6 +241,8 @@ class Pages:
 				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
 			else:
 				uid = None
+		else:
+			uid = None
 		if uid:
 			struct = "<script>location.href='%s';</script>"%(Main().url)
 		else:
@@ -264,10 +285,16 @@ class Pages:
 	def doLogout(self, request):
 		if request.COOKIES.has_key("SESSION_ID"):
 			sessionID = request.COOKIES["SESSION_ID"]
-			uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
 		if uid:
+			Main().execute(q="UPDATE pythobb_users SET loggedin='0' WHERE uid='%s'" % (uid),s=True)
 			sx = self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("logout"),self.getTemplate("footer")))			
 			sx.set_cookie('SESSION_ID','')
 			return sx
 		else:
-			return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("logouterror"),self.getTemplate("footer")))
+			return self.resp("<script>location.href='%s';</script>" % (Main().url))
