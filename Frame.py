@@ -38,9 +38,13 @@ class User:
 					)
 				]
 			if len(d) == 0:
-				return "No such user."
+				return False
 			else:
-				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-1],"avatar":d[0][4]}
+				if d[0][4] == "":
+					avatar = "http://i.imgur.com/JahN5AL.png"
+				else:
+					avatar = d[0][4]
+				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-1],"avatar":avatar}
 		except Exception as e:
 			return str("".join(e))
 
@@ -92,7 +96,7 @@ class Pages:
 		self.resp = HttpResponse
 			
 	def getTemplate(self, x, vars=None, t=None):
-		import re,json
+		import re,json,time
 		f = {
 			"forumtitle":"PythoBB",
 			"forumurl":"http://127.0.0.1:8000/"
@@ -102,7 +106,8 @@ class Pages:
 				"avatar":"<img src='%s'/ class='profava'>" % (vars["avatar"]),
 				"username":vars["username"],
 				"group":vars["group"],
-				"uid":vars["uid"]
+				"uid":vars["uid"],
+				"registered":time.strftime("%d/%m/%y", time.localtime(float(vars["registered"])))
 				}
 		else:
 			u = dict()
@@ -114,9 +119,12 @@ class Pages:
 		return y
 
 	def Index(self, request):
-		return self.resp(self.getTemplate("header")+self.getTemplate("index"))
+		return self.resp(self.getTemplate("header")+self.getTemplate("index")+self.getTemplate("footer"))
 
 	def Profile(self, request, username):
 		f = User().viewuser(username)
-		page = self.getTemplate("header")+self.getTemplate("profile",vars=f,t="user")
+		if f == False:
+			page = self.getTemplate("header")+self.getTemplate("404")+self.getTemplate("footer")
+		else:
+			page = self.getTemplate("header")+self.getTemplate("profile",vars=f,t="user")+self.getTemplate("footer")
 		return self.resp(page)
