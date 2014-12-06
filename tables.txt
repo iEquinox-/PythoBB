@@ -1,3 +1,4 @@
 Just a quick file to hold the database table structures for later reference.
 
 CREATE TABLE pythobb_users (username text,password text,salt text,email text,avatar text,regt text,groups text,uid text,loggedin text)
+CREATE TABLE pythobb_sessions (sessionid text, uid text)
