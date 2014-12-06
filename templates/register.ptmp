@@ -1,0 +1,11 @@
+	{[getCSRF]}
+	<div class='title login'>Register</div>
+	<div id='minicontainer'>
+		<form action='/member/register/doRegister/' method='post' class='loginmethod'>
+			{[csrfToken]}
+			<input type='text' name='username' maxlength='25' class='fieldtext' placeholder='Username'/><br/>
+			<input type='password' name='password' maxlength='25' class='fieldtext' placeholder='Password'/><br/>
+			<input type='password' name='repassword' maxlength='25' class='fieldtext' placeholder='Retype Password'/><br/>
+			<input type='text' name='email' class='fieldtext' placeholder='Email'/> <input type='submit' value='Register' class='fieldtext r'/>
+		</form>
+	</div>
