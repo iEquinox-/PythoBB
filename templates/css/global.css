@@ -1,0 +1,94 @@
+body {
+	background: #222;
+	margin: 0;
+}
+		
+a:link,
+a:hover,
+a:visited,
+a:active {
+	color: #FFF!important;
+	text-decoration: none;
+}
+		
+div#header {
+	background: #2ecc71;
+	padding: 20px;
+	border-bottom: 4px solid #27ae60;
+	font-family:'Raleway',sans-serif;
+	color: #FFF!important;
+	font-size: 45px;
+}
+		
+div#container {
+	width: 75%;
+	background: #444;
+	padding: 20px;
+	margin: 25px auto;
+}
+		
+div#container.error {
+	font-family:'Raleway',sans-serif;
+	text-align: center;
+	color: #FFF;
+	font-size: 35px;
+}
+		
+div#cont {
+	width: 25%;
+	background: #444;
+	margin: 25px auto;
+	padding: 20px;
+	border-radius: 3px;
+	text-align: center;
+}
+		
+div#cont > img.profava {
+	border-radius: 50%;
+	height: 100px;
+	width: 100px;
+}
+		
+div#cont > div#inf {
+	background: #555;
+	color: #FFF;
+	font-family: tohama,droid sans,sans-serif;
+	padding: 0 10px;
+	text-align: center;
+	position: absolute;
+	margin-left: -40px;
+	line-height: 30px;
+	height: 30px;
+	margin-top: -115px;
+	text-transform: capitalize;
+}
+		
+div#cont > div#inf:before {
+	content: ' ';
+	position: absolute;
+	border-bottom: 10px solid transparent;
+	border-right: 20px solid #333;
+	margin-top: 30px;
+	margin-left: -10px;
+}
+		
+div.hr {
+	margin-top: 5px;
+	border-top:1px solid #333;
+}
+		
+span.stat {
+	color: #FFF;
+	font-family: tohama,droid sans,sans-serif;
+}
+	
+div#footer {
+	padding: 20px;
+	background: #2ecc71;
+	border:4px solid #27ae60;
+	border-left: none;
+	border-right: none;
+	color: #FFF;
+	font-family:'Raleway',sans-serif;
+	font-size: 20px;
+}
