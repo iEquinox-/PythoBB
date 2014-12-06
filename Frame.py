@@ -40,7 +40,7 @@ class User:
 			if len(d) == 0:
 				return "No such user."
 			else:
-				return str("".join(d))
+				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-1],"avatar":d[0][4]}
 		except Exception as e:
 			return str("".join(e))
 
@@ -89,19 +89,32 @@ class User:
 class Pages:
 	def __init__(self):
 		from django.http import HttpResponse
-		import re
-		forum = {"forumtitle":"PythoBB Test Forum"}
 		self.resp = HttpResponse
-		header = open(Main().dir + "templates/header.ptmp","r").read()
-		for x in re.findall("\{\[(.*?)\]\}",header):
-			header = header.replace( "{["+x+"]}", forum[x] )
-		footer = ""
-		self.temp = {
-			"Index":header+"<body><div class='t'>Welcome to PythoBB.</div>%s</body>" % (footer)
+		self.temp = {"Index":self.getTemplate("header")+"<body><div class='title'>Welcome to PythoBB.</div></body>"}
+			
+	def getTemplate(self, x, vars=None):
+		import re,json
+		f = {
+			"forumtitle":"PythoBB",
+			"forumurl":"http://127.0.0.1:8000/"
 			}
+		if vars != None:
+			f = {
+				"forumtitle":"PythoBB",
+				"forumurl":"http://127.0.0.1:8000/",
+				"avatar":"<img src='%s'/ class='profava'>" % (vars["avatar"]),
+				"username":vars["username"]
+				}
+		y = open(Main().dir + "templates/%s.ptmp" % (x),"r").read()
+		for c in re.findall("\{\[(.*?)\]\}",y):
+			y = y.replace("{[%s]}"%(c),f[c])
+		return y
 
 	def Index(self, request):
 		return self.resp(self.temp["Index"])
 
 	def Profile(self, request, username):
-		return self.resp(User().viewuser(username))
+		f = User().viewuser(username)
+		# f["username"]+" "+f["registered"]+" "+f["group"]+" "+f["uid"]
+		page = self.getTemplate("header")+self.getTemplate("profile",vars=f)
+		return self.resp(page)
