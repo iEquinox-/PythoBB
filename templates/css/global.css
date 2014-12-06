@@ -92,3 +92,22 @@ div#footer {
 	font-family:'Raleway',sans-serif;
 	font-size: 20px;
 }
+
+div.title.login {
+	background: #2ecc71;
+	width: 400px;
+	margin: 25px auto 0;
+	padding: 20px;
+	color:#FFF;
+	font-family:tohama,droid sans,sans-serif;
+	border-radius: 3px 3px 0 0;
+}
+		
+div#minicontainer {
+	background:#444;
+	width: 400px;
+	margin: 0 auto 25px;
+	padding: 20px;
+	color: #FFF;
+	border-radius: 0 0 3px 3px;
+}
