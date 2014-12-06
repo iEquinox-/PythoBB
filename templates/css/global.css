@@ -24,6 +24,7 @@ div#container {
 	background: #444;
 	padding: 20px;
 	margin: 0 auto;
+	
 }
 		
 div#container.error {
@@ -130,3 +131,13 @@ div#userblock {
 }
 div#userblock > ul {padding:0;margin:0;}
 div#userblock > ul > li {display:inline;font-family:tohama,droid sans,sans-serif;margin:0 10px;}
+
+div#bottomblock {
+	width: 75%;
+	margin: 0 auto 25px;
+	padding: 20px;
+	background: #2ecc71;
+	border-radius: 0 0 3px 3px;
+	font-family: tohama,droid sans,sans-serif;
+	color: #FFF;
+}
