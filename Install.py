@@ -1,6 +1,7 @@
 import sqlite3,os,json
 
 sl = dict()
+dir = None
 
 queries = [
 	"CREATE TABLE pythobb_users (username text,password text,salt text,email text,avatar text,regt text,groups text,uid text,loggedin text)",
@@ -21,8 +22,8 @@ def getFiles():
 		return "Error. Are you logged into root? (%s)" % str(e)
 	
 def doQueries():
-	global queries,s
-	h = raw_input("Host: ")
+	global queries,s,dir
+	h = dir+raw_input("DB Name: ")
 	s = sqlite3.connect(h)
 	try:
 		for q in queries:
@@ -34,8 +35,8 @@ def doQueries():
 		return str(e)
 		
 def writeSettings():
-	global sl
-	f = open(raw_input("settings path: ")+"settings.txt","w")
+	global sl,dir
+	f = open(dir+"settings.txt","w")
 	c = ""
 	format = "%s = '%s';\n"
 	for x in sl:
@@ -64,6 +65,7 @@ def insertAdmin():
 	s.commit()
 	
 if __name__ == "__main__":
+	dir = raw_input("Directory: ")
 	print "If you haven't aleady installed Django, pip, and PythoBB, please login to root before running this script."
 	s = raw_input("Have you installed Django, pip, and PythoBB? [y/n]")
 	if s == "n":
