@@ -22,3 +22,11 @@ div#forumth > div#thread{
 
 div#category > div#forum > span.right.statistics,
 div#forumth > div#thread > span.right.statistics{float:right;}
+
+a.postbit_button {
+        background: #2ecc71;
+        padding: 10px;
+        border-radius: 2px;
+        float: right;
+        font-family: tohama,droid sans,sans-serif;
+}
