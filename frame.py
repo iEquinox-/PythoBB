@@ -284,4 +284,4 @@ class Pages:
 		o = request.GET["rel"]
 		if not o:
 			o = Main().url
-		return self.resp("<script>location.href='%s';</script>" % (o))
+		return self.resp("<script>location.href='{0}';</script>".format(o))
