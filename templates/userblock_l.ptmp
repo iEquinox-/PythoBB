@@ -2,5 +2,6 @@
 		<ul>
 			<li style='float:right;'><a href='{[forumurl]}member/logout/'>Logout</a></li>
 			<li><a href='{[forumurl]}user/{[username]}/'>{[username]}</a></li>
+			<li><a href='{[forumurl]}member/controlpanel/'>User CP</a></li>
 		</ul>
 	</div>
