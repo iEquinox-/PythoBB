@@ -1,0 +1,14 @@
+	{[userblock]}
+	<div id='container'>
+		<div style='text-align:right;display:inline-block;'>
+			{[getCSRF]}
+			<form action='/member/modifySettings/' method='post'>
+				{[csrfToken]}
+				<input type='text' class='fieldtext' name='avatar' placeholder='Avatar URL (100x100 recommended)' style='width:300px;'/><br/>
+				<input type='text' class='fieldtext' name='usertitle' placeholder='Usertitle' maxlength='15' style='width:300px;'/><br/>
+				<input type='submit' class='fieldtext' value='Update Settings'/>
+			</form>
+		</div>
+	</div>
+	<div id='bottomblock'>
+	</div>
