@@ -1,0 +1,9 @@
+	{[userblock]}
+	<div id='container'>
+			<div class='fname'>{[fname]}</div>
+				<div id='forumth'>
+					{[threads]}
+				</div>
+			<div class='fbot'></div>
+	</div>
+	<div id='bottomblock'></div>
