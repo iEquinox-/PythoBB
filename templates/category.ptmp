@@ -1,0 +1,5 @@
+	<div class='cname'>{[catname]}</div>
+	<div id='category'>
+		{[forums]}
+	</div>
+	<div class='cbot'></div>
