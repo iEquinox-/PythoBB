@@ -45,4 +45,4 @@ textarea.fieldtext {
 div.post {background:#222;padding: 10px 5px;}
 div.inf, div.post {margin:0 auto 5px;}
 
-div#post > img.profava {border-radius:50%;height:100px;width:100px;}
+div#post > div.inf > img.profava {border-radius:50%;height:100px;width:100px;}
