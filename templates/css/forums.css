@@ -5,3 +5,9 @@ div.cname {
         color: #FFF;
         font-family: tohama,droid sans,sans-serif;
 }
+
+div.cbot {
+        background: #2ecc71;
+        padding: 13px 10px;
+        border-radius: 0 0 3px 3px;
+}
