@@ -1,6 +1,6 @@
 div.cname {
         background: #2ecc71;
-        padding: 6px 10px;
+        padding: 15px 10px;
         border-radius: 3px 4px 0 0;
         color: #FFF;
         font-family: tohama,droid sans,sans-serif;
@@ -8,6 +8,15 @@ div.cname {
 
 div.cbot {
         background: #2ecc71;
-        padding: 13px 10px;
+        padding: 20px 10px;
         border-radius: 0 0 3px 3px;
 }
+
+div#category > div#forum {
+        background: #333;
+        padding: 15px 10px;
+        font-family: tohama,droid sans, sans-serif;
+        color: #fff;
+}
+
+div#category > div#forum > span.right.statistics {float:right;}
