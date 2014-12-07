@@ -112,7 +112,7 @@ div#minicontainer {
 
 div#minicontainer > span {font-family: tohama,droid sans,sans-serif;}
 
-div#minicontainer > form.loginmethod > input.fieldtext {
+input.fieldtext {
 	background: #DDD;
 	padding: 10px;
 	margin: 2px 0;
