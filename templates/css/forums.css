@@ -41,3 +41,5 @@ textarea.fieldtext {
         color: #FFF;
         font-size: 13px;
 }
+
+div.inf, div.post {background:#222;padding: 10px 0;}
