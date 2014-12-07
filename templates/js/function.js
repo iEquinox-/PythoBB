@@ -22,6 +22,10 @@ function doCSRF() {
 	// Change token
 
 	jQuery(document).ready(function($){
-		$("input.CSRFToken").attr('value',csrftoken);
+		if(csrftoken != null){
+			$("input.CSRFToken").attr('value',csrftoken);
+		} else {
+			location.href = "/doToken/?rel="+document.url;
+		}
 	});
 }
