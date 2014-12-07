@@ -1,6 +1,6 @@
 	{[userblock]}
 	<div id='container'>
-		<a href='{[newthread]}' class='postbit_buttom'>New Thread</a>
+		<a href='{[newthread]}' class='postbit_button'>New Thread</a>
 		<br/><br/><br/>
 		<div class='fname'>{[fname]}</div>
 			<div id='forumth'>
