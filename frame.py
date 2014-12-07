@@ -137,7 +137,7 @@ class Pages:
 			"forumtitle":"PythoBB",
 			"forumurl":Main().url,
 			"csrfToken":"""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""",
-			"getCSRF":"<script>"+open(Main().dir + "templates/js/getCSRF.js","r").read()+"doCSRF();</script>",
+			"getCSRF":"<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>",
 			"userblock":self.Userblock(auth[0],auth[1]),
 			"respawn":"<script>setTimeout(function(){location.href='%s';},200);</script>" % (Main().url),
 			"whosonline":self.getOnline(v=False)
@@ -304,3 +304,11 @@ class Pages:
 			return sx
 		else:
 			return self.resp("<script>location.href='%s';</script>" % (Main().url))
+
+	def doToken(self, request): # If CSRF token is lost
+		from django.middleware.csrf import rotate_token
+		rotate_token(request)
+		o = request.GET["rel"]
+		if not o:
+			o = Main().url
+		return self.resp("<script>location.href='%s';</script>" % (o))
