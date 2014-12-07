@@ -30,5 +30,6 @@ urlpatterns = patterns('',
     url(r'^member/logout/$',f.Pages().doLogout,name='doLogout'),
     url(r'^lostcsrf/doToken/$',f.Pages().doToken,name='doToken'),
     url(r'^forum/(?P<fid>\d+)/$',f.Pages().Forum,name='Forum'),
+    url(r'^forum/(?P<fid>\d+)/newthread/$',f.Pages().MakeThread,name='MakeThread'),
     url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/$',f.Pages().Thread,name='Thread')
 )
