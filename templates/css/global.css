@@ -141,3 +141,11 @@ div#bottomblock {
 	font-family: tohama,droid sans,sans-serif;
 	color: #FFF;
 }
+
+div.msg {
+	background: #333;
+	padding: 10px;
+	text-align: center;
+	margin: 0 auto 10px;
+	font-family: tohama,droid sans,sans-serif;
+}
