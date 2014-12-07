@@ -42,4 +42,5 @@ textarea.fieldtext {
         font-size: 13px;
 }
 
-div.inf, div.post {background:#222;padding: 10px 0;}
+div.post {background:#222;padding: 10px 5px;}
+div.inf, div.post {margin:0 auto 5px;}
