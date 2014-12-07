@@ -30,3 +30,13 @@ a.postbit_button {
         float: right;
         font-family: tohama,droid sans,sans-serif;
 }
+
+textarea.fieldtext {
+        background: #222;
+        border: 1px solid #111;
+        border-radius: 3px;
+        padding: 6px 10px;
+        font-family: tohama,droid sans,sans-serif;
+        color: #FFF;
+        font-size: 13px;
+}
