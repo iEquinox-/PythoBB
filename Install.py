@@ -46,7 +46,7 @@ class PageOut():
 		
 	def Configure(self, c=None, v=None):
 		if(c and v):
-			import sqlite3
+			import sqlite3,hashlib
 			queries = [
 				"CREATE TABLE pythobb_users (username text,password text,salt text,email text,avatar text,regt text,usertitle text,groups text,uid text)",
 				"CREATE TABLE pythobb_sessions (sessionid text, uid text)"
@@ -54,11 +54,17 @@ class PageOut():
 			s = sqlite3.connect(c["database"])
 			for query in queries:
 				s.cursor().execute(query)
-			s.cursor().execute("INSERT INTO pythobb_users VALUES ('{0}','{1}','{2}','{3}','','{4}','Administrator','admin','1')".format(v["username"],v["password"],v["salt"],v["email"],v["time"])
+			s.cursor().execute("INSERT INTO pythobb_users VALUES ('{0}','{1}','{2}','{3}','','{4}','Administrator','admin','1')".format(v["username"],v["password"],v["salt"],v["email"],v["time"]))
 			s.cursor().execute("INSERT INTO pythobb_sessions VALUES ('{0}','1')".format(hashlib.md5(c["new"]+c["renew"]).hexdigest()))
-			f = open(c["dir"]+"settings.txt","w")
+			f = open(c["directory"]+"settings.txt","w")
+			
+			settings = ""
+			for v in ["directory","database"]:
+				settings += "%s = '%s';\n" % (v,c[v])
+			
 			f.write(settings)
 			f.close()
+			s.commit()
 
 	def doConfigure(self,request):
 		if request.POST["pass"] != request.POST["repass"]:
@@ -68,7 +74,7 @@ class PageOut():
 			def salt(): return str("".join([random.choice( list( string.ascii_letters + "+_)(*&^%$#@!" ) ) for x in range(0,5)]))
 			cdata     = {"directory":request.POST["dir"],"database":request.POST["dir"]+request.POST["db"],"new":salt(),"renew":salt()}
 			salty = salt()
-			variables = {"username":request.POST["aduser"],"password":hashlib.md5(request.POST["pass"]+salty),"salt":salty,"email":request.POST["email"],"time":time.time()}
+			variables = {"username":request.POST["aduser"],"password":hashlib.md5(request.POST["pass"]+salty).hexdigest(),"salt":salty,"email":request.POST["email"],"time":time.time()}
 			self.Configure(c=cdata,v=variables)			
 			f = open(self.dir+"/install","w")
 			f.write("True")
