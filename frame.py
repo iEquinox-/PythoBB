@@ -4,7 +4,7 @@ class Main:
 		self.modules = [os,sqlite3,re,json]
 		self.dir = "/home/equinox/pythobb/pythobb/" # Dir of PythoBB
 		self.url = "http://127.0.0.1:8000/"
-		self.host = re.search("host = '(.*?)';\n",open(self.dir+"settings.txt","r").read()).group(1)
+		self.host = re.search("database = '(.*?)';\n",open(self.dir+"settings.txt","r").read()).group(1)
 		self.db = self.connect()
 
 	def connect(self): # Connect to DB
@@ -33,19 +33,10 @@ class User:
 	def authorize(self, inp):
 		import hashlib
 		x = Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(inp[0]),s=False)
-		uid = [c for c in x][0][-2]
 		if len([c for c in x]) == 0:
-			nx = Main().execute(q="SELECT * FROM pythobb_users WHERE email='%s'"%(inp[0]),s=False)
-			uid = [c for c in x][0][-2]
-			if len([c for c in nx]) == 0:
-				return ["Invalid username/email."]
-			else:
-				s = [c for c in nx][0][2]
-				if hashlib.md5(inp[1]+s).hexdigest() != [c for c in nx][0][1]:
-					return ["Mismatched password."]
-				else:
-					return ["Login successful.",uid]
+			return ["Invalid username."]
 		else:
+			uid = [c for c in x][0][-1]
 			s = [c for c in x][0][2]
 			if hashlib.md5(inp[1]+s).hexdigest() != [c for c in x][0][1]:
 				return ["Mismatched password."]
@@ -68,7 +59,7 @@ class User:
 					avatar = "http://i.imgur.com/JahN5AL.png"
 				else:
 					avatar = d[0][4]
-				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-2],"avatar":avatar}
+				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-1],"avatar":avatar}
 		except Exception as e:
 			return str("".join(e))
 
@@ -96,7 +87,7 @@ class User:
 					)
 				return n
 			def uid():
-				return int(len([c for c in Main().execute(q="SELECT * FROM pythobb_users",s=False)])+1)
+				return len([c for c in Main().execute(q="SELECT * FROM pythobb_users",s=False)])+1
 			def sessionID():
 				import random,hashlib
 				r = random.randrange(2 ** 15,3**14)
@@ -139,8 +130,7 @@ class Pages:
 			"csrfToken":"""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""",
 			"getCSRF":"<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>",
 			"userblock":self.Userblock(auth[0],auth[1]),
-			"respawn":"<script>setTimeout(function(){location.href='%s';},200);</script>" % (Main().url),
-			"whosonline":self.getOnline(v=False)
+			"respawn":"<script>setTimeout(function(){location.href='%s';},200);</script>" % (Main().url)
 			}
 		if(vars != None)and(t=="user"):
 			u = {
@@ -159,28 +149,11 @@ class Pages:
 				except: pass
 		return y
 		
-	def getOnline(self,v=False):
-		if not v:
-			s1 = self.getOnline(v=True)
-			if s1 > 1:
-				s2 = "s"
-			else:
-				if s1 == 0:
-					s2 = "s"
-				else:
-					s2 = ""
-			s1 = str(s1)
-			s = str(open(Main().dir+"templates/whosonline.ptmp","r").read()).replace("{[whosonline_users]}",s1).replace("{[s]}",s2)
-			return s
-		else:
-			c = [x for x in Main().execute(q="SELECT * FROM pythobb_users WHERE loggedin='1'",s=False)]
-			return len(c)
-		
 	def Userblock(self, a1, a2):
 		if a1 == True:
 			import re
 			s = str(open(Main().dir+"templates/userblock_l.ptmp","r").read())
-			usr = [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'" % (a2))][0][0]
+			usr = [v for v in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(a2),s=False)][0][0]
 			x = {"forumurl":Main().url,"username":usr}
 			for c in re.findall("\{\[(.*?)\]\}",s):
 				s = s.replace( "{[%s]}"%(c), x[c] )
@@ -192,7 +165,7 @@ class Pages:
 		if request.COOKIES.has_key("SESSION_ID"):
 			sessionID = request.COOKIES["SESSION_ID"]
 			if(len(sessionID)>0):
-				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][1]
 			else:
 				uid = None
 		else:
@@ -260,7 +233,7 @@ class Pages:
 		r = User().authorize(inp=[u,p])
 		if r[0] == "Mismatched password.":
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("login").replace("<div class='title login'>Login</div>","<div class='title login' style='background:#EE3535;'>Login</div>"),self.getTemplate("footer"))
-		if r[0] == "Invalid username/email.":
+		if r[0] == "Invalid username.":
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("login").replace("<div class='title login'>Login</div>","<div class='title login' style='background:#EE3535;'>Login</div>"),self.getTemplate("footer"))
 		if r[0] == "Login successful.":
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("successfullogin"),self.getTemplate("footer"))
