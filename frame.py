@@ -156,6 +156,14 @@ class Forums:
 			s += str( temp.replace("{[catname]}",x[0]).replace("{[forums]}",self.genFor( self.get_for(cid) )) +"<br/>")
 		return s
 		
+	def genThreads(self, array):
+		temp = open(Main().dir+"templates/thread.ptmp","r").read()
+		s = ""
+		for x in array:
+			last = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % (x[2]),s=False)][-1][-1]
+			s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Lastpost by "+last.split(":")[0]) )
+		return s
+		
 
 class Pages:
 	def __init__(self):
@@ -181,9 +189,11 @@ class Pages:
 				"usertitle":vars["usertitle"],
 				"registered":time.strftime("%d/%m/%y", time.localtime(float(vars["registered"])))
 				}
-		elif(vars != None)and(t=="cats"):
+		elif(vars != None)and(t=="cats"): u = {"category":Forums().genCat(Forums().get_cat())}
+		elif(vars != None)and(t=="forum"):
 			u = {
-				"category":Forums().genCat(Forums().get_cat())
+				"fname":[c for c in Main().execute(q="SELECT * FROM  pythobb_forums WHERE fid='%s'" % (vars["fid"]),s=False)][0][0],
+				"threads":Forums().genThreads(array=[c for c in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(vars["fid"]),s=False)])
 				}
 		else:
 			u = dict()
@@ -374,3 +384,20 @@ class Pages:
 					return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Error, try again. If the problem persists, contain the site admin.</div>"),self.getTemplate("footer")))
 		else:
 			return self.resp("<script>location.href='%s';</script>" % (Main().url))
+			
+	def Forum(self, request, fid):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			return self.resp(self.getTemplate("header")+self.getTemplate("fpage",t="forum",vars={"fid":fid},auth=[True,uid])+self.getTemplate("footer"))
+		else:
+			return self.resp(self.getTemplate("header")+self.getTemplate("fpage",t="forum",vars={"fid":fid})+self.getTemplate("footer"))
+
+	def Thread(self, request, fid, tid):
+		return self.resp(fid+" "+tid)
