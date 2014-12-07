@@ -2,6 +2,7 @@ class Main:
 	def __init__(self):
 		import sqlite3,os,re,json
 		self.modules = [os,sqlite3,re,json]
+		self.forum = "PythoBB"
 		self.dir = "/home/equinox/pythobb/pythobb/" # Dir of PythoBB
 		self.url = "http://127.0.0.1:8000/"
 		self.host = re.search("database = '(.*?)';\n",open(self.dir+"settings.txt","r").read()).group(1)
@@ -117,6 +118,45 @@ class User:
 		else:
 			return "Variable \"vars\" (DictType) too short."
 
+class Forums:
+	def __init__(self):
+		self.types = {"forum":"pythobb_forums","category":"pythobb_cat"}
+	
+	def get_cat(self):
+		cat = [c for c in Main().execute(q="SELECT * FROM {0}".format(self.types["category"]),s=False)]
+		return cat
+		
+	def get_for(self, cid):
+		fors = [c for c in Main().execute(q="SELECT * FROM {0} WHERE parent='{1}'".format(self.types["forum"],str(cid)))]
+		return fors
+		
+	def getAmount(self, o, fid):
+		if o == "p":
+			v = 0
+			threads = [t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(fid),s=False)] # Get threads for counting posts
+			for x in threads:
+				tid = x[1]
+				v += len([c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%(tid),s=False)])
+			return str(v)
+		if o == "t":
+			return str(len([t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(fid),s=False)]))
+		
+	def genFor(self, array):
+		temp = open(Main().dir+"templates/forum.ptmp","r").read()
+		s = ""
+		for x in array:
+			s += str( temp.replace("{[forumname]}",x[0]).replace("{[forumurl]}",Main().url+"forum/{0}/".format(x[1])).replace("{[posts]}","{0} Posts in".format(self.getAmount("p",x[1]))).replace("{[threads]}",self.getAmount("t",x[1])+" Threads")  )
+		return s
+		
+	def genCat(self, array):
+		temp = open(Main().dir+"templates/category.ptmp","r").read()
+		s = ""
+		for x in array:
+			cid = x[1]
+			s += str( temp.replace("{[catname]}",x[0]).replace("{[forums]}",self.genFor( self.get_for(cid) )) +"<br/>")
+		return s
+		
+
 class Pages:
 	def __init__(self):
 		from django.http import HttpResponse
@@ -125,7 +165,7 @@ class Pages:
 	def getTemplate(self, x, vars=None, t=None, auth=[False,None]):
 		import re,json,time
 		f = {
-			"forumtitle":"PythoBB",
+			"forumtitle":Main().forum,
 			"forumurl":Main().url,
 			"csrfToken":"""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""",
 			"getCSRF":"<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>",
@@ -140,6 +180,10 @@ class Pages:
 				"uid":vars["uid"],
 				"usertitle":vars["usertitle"],
 				"registered":time.strftime("%d/%m/%y", time.localtime(float(vars["registered"])))
+				}
+		elif(vars != None)and(t=="cats"):
+			u = {
+				"category":Forums().genCat(Forums().get_cat())
 				}
 		else:
 			u = dict()
@@ -172,9 +216,9 @@ class Pages:
 		else:
 			uid = None
 		if uid:
-			return self.resp(self.getTemplate("header")+self.getTemplate("index",auth=[True,uid])+self.getTemplate("footer"))
+			return self.resp(self.getTemplate("header")+self.getTemplate("index",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
 		else:
-			return self.resp(self.getTemplate("header")+self.getTemplate("index")+self.getTemplate("footer"))
+			return self.resp(self.getTemplate("header")+self.getTemplate("index",vars={},t="cats")+self.getTemplate("footer"))
 
 	def Profile(self, request, username):
 		f = User().viewuser(username)
