@@ -49,7 +49,11 @@ class PageOut():
 			import sqlite3,hashlib
 			queries = [
 				"CREATE TABLE pythobb_users (username text,password text,salt text,email text,avatar text,regt text,usertitle text,groups text,uid text)",
-				"CREATE TABLE pythobb_sessions (sessionid text, uid text)"
+				"CREATE TABLE pythobb_sessions (sessionid text, uid text)",
+				"CREATE TABLE pythobb_cat (category text,cid text,permissions text)",
+				"CREATE TABLE pythobb_forums (forum text,fid text,parent text,permissions text)",
+				"CREATE TABLE pythobb_threads (thread text,tid text,parent text)",
+				"CREATE TABLE pythobb_posts (pid text, parent text,content text,inf text)"
 				]
 			s = sqlite3.connect(c["database"])
 			for query in queries:
