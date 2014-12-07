@@ -28,5 +28,7 @@ urlpatterns = patterns('',
     url(r'^member/register/$',f.Pages().Register,name='Register'),
     url(r'^member/register/doRegister/$',f.Pages().doRegister,name='doRegister'),
     url(r'^member/logout/$',f.Pages().doLogout,name='doLogout'),
-    url(r'^lostcsrf/doToken/$',f.Pages().doToken,name='doToken')
+    url(r'^lostcsrf/doToken/$',f.Pages().doToken,name='doToken'),
+    url(r'^forum/(?P<fid>\d+)/$',f.Pages().Forum,name='Forum'),
+    url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/$',f.Pages().Thread,name='Thread')
 )
