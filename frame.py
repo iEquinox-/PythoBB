@@ -59,7 +59,7 @@ class User:
 					avatar = "http://i.imgur.com/JahN5AL.png"
 				else:
 					avatar = d[0][4]
-				return {"username":d[0][0],"registered":d[0][5],"group":d[0][6],"uid":d[0][-1],"avatar":avatar}
+				return {"username":d[0][0],"registered":d[0][5],"group":d[0][-2],"uid":d[0][-1],"avatar":avatar,"usertitle":d[0][-3]}
 		except Exception as e:
 			return str("".join(e))
 
@@ -138,6 +138,7 @@ class Pages:
 				"username":vars["username"],
 				"group":vars["group"],
 				"uid":vars["uid"],
+				"usertitle":vars["usertitle"],
 				"registered":time.strftime("%d/%m/%y", time.localtime(float(vars["registered"])))
 				}
 		else:
@@ -237,7 +238,7 @@ class Pages:
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("login").replace("<div class='title login'>Login</div>","<div class='title login' style='background:#EE3535;'>Login</div>"),self.getTemplate("footer"))
 		if r[0] == "Login successful.":
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("successfullogin"),self.getTemplate("footer"))
-			Main().execute(q="UPDATE pythobb_users SET loggedin='1' WHERE uid='%s'" % (r[1]),s=True)
+			#Main().execute(q="UPDATE pythobb_users SET loggedin='1' WHERE uid='%s'" % (r[1]),s=True)
 			sid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE uid='%s'" % (r[1]),s=False)][0][0]
 		sx = self.resp(s)
 		sx.set_cookie('SESSION_ID',sid)
@@ -284,4 +285,48 @@ class Pages:
 		o = request.GET["rel"]
 		if not o:
 			o = Main().url
-		return self.resp("<script>location.href='{0}';</script>".format(o))
+		return self.resp("<script>location.href='%s';</script>" % (o))
+		
+	def userCP(self, request):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if not uid:
+			return self.resp("<script>location.href='%s';</script>"%(Main().url))
+		else:
+			return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]),self.getTemplate("footer")))
+
+	def modifySettings(self, request):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			if(request.POST["avatar"])and(request.POST["avatar"] != ""):
+				try:
+					r = request.POST["avatar"]
+					allowed = [".gif",".png",".jpg"]
+					if not "."+str(r)[::-1][0:3][::-1] in allowed:
+						return
+					else:
+						Main().execute(q="UPDATE pythobb_users SET avatar='%s' WHERE uid='%s'" % (r,uid),s=True)
+						return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Your settings have been successfully updated.</div>"),self.getTemplate("footer")))
+				except Exception as e:
+					return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Error, try again. If the problem persists, contain the site admin.</div>"),self.getTemplate("footer")))
+			if(request.POST["usertitle"])and(request.POST["usertitle"] != ""):
+				try:
+					Main().execute(q="UPDATE pythobb_users SET usertitle='%s' WHERE uid='%s'" % (request.POST["usertitle"],uid),s=True)
+					return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Your settings have been successfully updated.</div>"),self.getTemplate("footer")))
+				except Exception as e:
+					return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Error, try again. If the problem persists, contain the site admin.</div>"),self.getTemplate("footer")))
+		else:
+			return self.resp("<script>location.href='%s';</script>" % (Main().url))
