@@ -1,4 +1,4 @@
-div.cname,div.fname,div.pname {
+div.cname,div.fname {
         background: #2ecc71;
         padding: 15px 10px;
         border-radius: 3px 4px 0 0;
@@ -6,7 +6,7 @@ div.cname,div.fname,div.pname {
         font-family: tohama,droid sans,sans-serif;
 }
 
-div.cbot,div.fbot,div.pbot {
+div.cbot,div.fbot {
         background: #2ecc71;
         padding: 20px 10px;
         border-radius: 0 0 3px 3px;
