@@ -164,6 +164,13 @@ class Forums:
 			s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Lastpost by "+last.split(":")[0]) )
 		return s
 		
+	def genPosts(self, array, fid, tid):
+		temp = open(Main().dir+"templates/posts.ptmp","r").read()
+		s = ""
+		for x in array:
+			s += str( temp.replace("{[fname]}",[t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE tid='%s'"%(tid),s=False)][0][0] ) )
+		return s.replace("{[getCSRF]}","<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>").replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""")
+		
 
 class Pages:
 	def __init__(self):
@@ -193,7 +200,13 @@ class Pages:
 		elif(vars != None)and(t=="forum"):
 			u = {
 				"fname":[c for c in Main().execute(q="SELECT * FROM  pythobb_forums WHERE fid='%s'" % (vars["fid"]),s=False)][0][0],
-				"threads":Forums().genThreads(array=[c for c in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(vars["fid"]),s=False)])
+				"threads":Forums().genThreads(array=[c for c in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(vars["fid"]),s=False)]),
+				"newthread":Main().url+"forum/{0}/newthread/".format(vars["fid"])
+				}
+		elif(vars != None)and(t=="showthread"):
+			u = {
+				"newpost":Main().url+"forum/{0}/{1}/#newpost".format(vars["fid"],vars["tid"]),
+				"posts":Forums().genPosts(array=[c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%vars["tid"],s=False)],fid=vars["fid"],tid=vars["tid"])
 				}
 		else:
 			u = dict()
@@ -400,4 +413,18 @@ class Pages:
 			return self.resp(self.getTemplate("header")+self.getTemplate("fpage",t="forum",vars={"fid":fid})+self.getTemplate("footer"))
 
 	def Thread(self, request, fid, tid):
-		return self.resp(fid+" "+tid)
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			return self.resp(self.getTemplate("header")+self.getTemplate("showthread",auth=[True,uid],vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
+		else:
+			return self.resp(self.getTemplate("header")+self.getTemplate("showthread",vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
+
+	def MakeThread(self, request, fid):
+		return self.resp("None")
