@@ -1,4 +1,4 @@
-div.cname {
+div.cname,div.fname {
         background: #2ecc71;
         padding: 15px 10px;
         border-radius: 3px 4px 0 0;
@@ -6,17 +6,19 @@ div.cname {
         font-family: tohama,droid sans,sans-serif;
 }
 
-div.cbot {
+div.cbot,div.fbot {
         background: #2ecc71;
         padding: 20px 10px;
         border-radius: 0 0 3px 3px;
 }
 
-div#category > div#forum {
+div#category > div#forum,
+div#forumth > div#thread{
         background: #333;
         padding: 15px 10px;
         font-family: tohama,droid sans, sans-serif;
         color: #fff;
 }
 
-div#category > div#forum > span.right.statistics {float:right;}
+div#category > div#forum > span.right.statistics,
+div#forumth > div#thread > span.right.statistics{float:right;}
