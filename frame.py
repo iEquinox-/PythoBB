@@ -2,7 +2,7 @@ class Main:
 	def __init__(self):
 		import sqlite3,os,re,json
 		self.modules = [os,sqlite3,re,json]
-		self.dir = "/home/equinox/pythobb/pythobb/" # Dir of PythoBB
+		self.dir = re.search("directory = '(.*?)';\n",open(self.dir+"settings.txt","r").read()).group(1)
 		self.url = "http://127.0.0.1:8000/"
 		self.host = re.search("database = '(.*?)';\n",open(self.dir+"settings.txt","r").read()).group(1)
 		self.db = self.connect()
