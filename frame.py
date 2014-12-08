@@ -169,7 +169,19 @@ class Forums:
 		s = ""
 		for x in array:
 			s += str( temp.replace("{[fname]}",[t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE tid='%s'"%(tid),s=False)][0][0] ) )
-		return s.replace("{[getCSRF]}","<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>").replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""")
+		return s.replace("{[getCSRF]}","<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>").replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""").replace("{[showposts]}",self.generatePosts(fid,tid)).replace("{[fid]}",fid).replace("{[tid]}",tid)
+		
+	def generatePosts(self, fid, tid):
+		temp = open(Main().dir+"templates/post.ptmp","r").read()
+		p = 0
+		s = ""
+		array = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%(tid),s=False)]
+		for x in array:
+			p += 1
+			usr = x[-1].split(":")[0]
+			av = [v for v in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(usr),s=False)][0][4]
+			s += temp.replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}",x[2]).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
+		return s
 		
 
 class Pages:
