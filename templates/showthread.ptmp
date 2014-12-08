@@ -1,0 +1,7 @@
+	{[userblock]}
+	<div id='container'>
+		<a href='{[newpost]}' class='postbit_button'>New Post</a>
+		<br/><br/><br/>
+		{[posts]}
+	</div>
+	<div id='bottomblock'></div>
