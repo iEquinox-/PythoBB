@@ -117,6 +117,13 @@ class User:
 				return False,str(e)
 		else:
 			return "Variable \"vars\" (DictType) too short."
+			
+	def Check(self, uid):
+		group = [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][-2]
+		if group == "banned":
+			return 0
+		else:
+			return 1
 
 class Forums:
 	def __init__(self):
@@ -187,20 +194,8 @@ class Forums:
 			else:
 				delButton = ""
 			av = [v for v in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(usr),s=False)][0][4]
-			s += temp.replace("{[deletepost]}",delButton).replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}", BBCode().Check(x[2]) ).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
+			s += temp.replace("{[deletepost]}",delButton).replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}", x[2] ).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
 		return s
-		
-class BBCode:
-	def __init__(self):
-		import re,types
-		self.modules = [re,types]
-		
-	def Check(self, content):
-		# Checking for BBCode
-		quote = self.modules[0].findall('\[quote="(.*?)"\](.*?)\[/quote\]',content)
-		if len(quote) != 0:
-			content = content.replace(quote.group(), "shit")
-		return content
 			
 class Pages:
 	def __init__(self):
@@ -238,6 +233,11 @@ class Pages:
 				"newpost":Main().url+"forum/{0}/{1}/#newpost".format(vars["fid"],vars["tid"]),
 				"posts":Forums().genPosts(_uid_=auth[1],array=[c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%vars["tid"],s=False)],fid=vars["fid"],tid=vars["tid"],loggedin=auth[0])
 				}
+		elif(vars != None)and(t=="administrator"):
+			u = {
+				"categories":Admin().generateCategories(),
+				"members":Admin().generateMembers()
+				}
 		else:
 			u = dict()
 		y = open(Main().dir + "templates/%s.ptmp" % (x),"r").read()
@@ -252,7 +252,14 @@ class Pages:
 			import re
 			s = str(open(Main().dir+"templates/userblock_l.ptmp","r").read())
 			usr = [v for v in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(a2),s=False)][0][0]
-			x = {"forumurl":Main().url,"username":usr}
+			if "admin" in [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(a2),s=False)][0][7].split(","):
+				acp = "<li><a href='%s'>Admin CP</a></li>" % (Main().url+"admin/")
+			else:
+				acp = ""
+			if [x for x in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(a2),s=False)][0][-2] == "banned":
+				x = {"forumurl":"","username":usr,"admincp":"","logout":"","usercp":""}
+			else:	
+				x = {"forumurl":Main().url,"username":usr,"admincp":acp,"logout":"<li style='float:right;'><a href='{[forumurl]}member/logout/'>Logout</a></li>","usercp":"<li><a href='{[forumurl]}member/controlpanel/'>User CP</a></li>"}
 			for c in re.findall("\{\[(.*?)\]\}",s):
 				s = s.replace( "{[%s]}"%(c), x[c] )
 			return s
@@ -269,7 +276,10 @@ class Pages:
 		else:
 			uid = None
 		if uid:
-			return self.resp(self.getTemplate("header")+self.getTemplate("index",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
+			if User().Check(uid) == 1:
+				return self.resp(self.getTemplate("header")+self.getTemplate("index",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
+			else:
+				return self.resp(self.getTemplate("header")+self.getTemplate("banned",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
 		else:
 			return self.resp(self.getTemplate("header")+self.getTemplate("index",vars={},t="cats")+self.getTemplate("footer"))
 
@@ -284,11 +294,14 @@ class Pages:
 		else:
 			uid = None
 		if uid:
-			if f == False:
-				page = self.getTemplate("header")+self.getTemplate("404",auth=[True,uid])+self.getTemplate("footer")
+			if User().Check(uid) == 0:
+				return self.resp(self.getTemplate("header")+self.getTemplate("banned",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
 			else:
-				page = self.getTemplate("header")+self.getTemplate("profile",vars=f,t="user",auth=[True,uid])+self.getTemplate("footer")
-			return self.resp(page)
+				if f == False:
+					page = self.getTemplate("header")+self.getTemplate("404",auth=[True,uid])+self.getTemplate("footer")
+				else:
+					page = self.getTemplate("header")+self.getTemplate("profile",vars=f,t="user",auth=[True,uid])+self.getTemplate("footer")
+				return self.resp(page)
 		else:
 			if f == False:
 				page = self.getTemplate("header")+self.getTemplate("404")+self.getTemplate("footer")
@@ -369,10 +382,13 @@ class Pages:
 		else:
 			uid = None
 		if uid:
-			Main().execute(q="UPDATE pythobb_users SET loggedin='0' WHERE uid='%s'" % (uid),s=True)
-			sx = self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("logout"),self.getTemplate("footer")))			
-			sx.set_cookie('SESSION_ID','')
-			return sx
+			if User().Check(uid) == 0:
+				return self.resp(self.getTemplate("header")+self.getTemplate("banned",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
+			else:
+				Main().execute(q="UPDATE pythobb_users SET loggedin='0' WHERE uid='%s'" % (uid),s=True)
+				sx = self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("logout"),self.getTemplate("footer")))			
+				sx.set_cookie('SESSION_ID','')
+				return sx
 		else:
 			return self.resp("<script>location.href='%s';</script>" % (Main().url))
 
@@ -438,7 +454,10 @@ class Pages:
 		else:
 			uid = None
 		if uid:
-			return self.resp(self.getTemplate("header")+self.getTemplate("fpage",t="forum",vars={"fid":fid},auth=[True,uid])+self.getTemplate("footer"))
+			if User().Check(uid) == 0:
+				return self.resp(self.getTemplate("header")+self.getTemplate("banned",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
+			else:
+				return self.resp(self.getTemplate("header")+self.getTemplate("fpage",t="forum",vars={"fid":fid},auth=[True,uid])+self.getTemplate("footer"))
 		else:
 			return self.resp(self.getTemplate("header")+self.getTemplate("fpage",t="forum",vars={"fid":fid})+self.getTemplate("footer"))
 
@@ -452,7 +471,10 @@ class Pages:
 		else:
 			uid = None
 		if uid:
-			return self.resp(self.getTemplate("header")+self.getTemplate("showthread",auth=[True,uid],vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
+			if User().Check(uid) == 0:
+				return self.resp(self.getTemplate("header")+self.getTemplate("banned",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
+			else:
+				return self.resp(self.getTemplate("header")+self.getTemplate("showthread",auth=[True,uid],vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
 		else:
 			return self.resp(self.getTemplate("header")+self.getTemplate("showthread",vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
 
@@ -468,7 +490,10 @@ class Pages:
 		if not uid:
 			return self.resp("<script>location.href='%s';</script>"%(Main().url+"member/login/"))
 		else:
-			return self.resp(self.getTemplate("header")+self.getTemplate("makethread",auth=[True,uid]).replace("{[fid]}",fid)+self.getTemplate("footer"))
+			if User().Check(uid) == 0:
+				return self.resp(self.getTemplate("header")+self.getTemplate("banned",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
+			else:
+				return self.resp(self.getTemplate("header")+self.getTemplate("makethread",auth=[True,uid]).replace("{[fid]}",fid)+self.getTemplate("footer"))
 		
 	def MakePost(self, request, fid, tid):
 		if request.COOKIES.has_key("SESSION_ID"):
@@ -511,3 +536,138 @@ class Pages:
 			return self.resp("<script>location.href='%s';</script>" % (Main().url+"forum/{0}/{1}/".format(fid,tid)))
 		else:
 			return self.resp("<script>location.href='%s';</script>" % (Main().url+"member/login/"))
+			
+	def Administrator(self, request):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			groups = [x for x in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][7].split(",")
+			if not "admin" in groups:
+				return self.resp("<script>location.href='%s';</script>" % (Main().url))
+			else:
+				return self.resp(
+					self.getTemplate("header") + 
+					self.getTemplate("admin",auth=[True,uid],t="administrator",vars={}).replace("{[emsg]}","") +
+					self.getTemplate("footer")
+					)
+		else:
+			return self.resp("<script>location.href='%s';</script>" % (Main().url))
+
+class Admin:
+	def __init__(self):
+		from django.http import HttpResponse
+		self.resp = HttpResponse
+		
+	def Add(self, request):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			if request.POST["add_catname"] != "":
+				r = request.POST["add_catname"].split("}")
+				if len(r) > 2:
+					return self.resp(
+						Pages().getTemplate("header") + 
+						Pages().getTemplate("admin",auth=[True,uid],t="administrator",vars={}).replace("{[emsg]}","<div class='error'>Too many parents to forum \"%s\".</div>" % (r[-1])) +
+						Pages().getTemplate("footer")
+						)
+				else:
+					if len(r) == 1:
+						def genCid():
+							return str(int(len([x for x in Main().execute(q="SELECT * FROM pythobb_cat",s=False)]) + 1))
+						Main().execute(q="INSERT INTO pythobb_cat VALUES ('%s','%s','x')" % (r[0],genCid()),s=True)
+						msg = "<div class='success'>Category succesfully added.</div>"
+					if len(r) == 2:
+						def genFid():
+							return str(int(len([x for x in Main().execute(q="SELECT * FROM pythobb_forums",s=False)]) + 1))
+						Main().execute(q="INSERT INTO pythobb_forums VALUES ('%s','%s','%s','x')" % (r[1],genFid(),r[0]),s=True)
+						msg = "<div class='success'>Forum succesfully added.</div>"
+					return self.resp(
+						Pages().getTemplate("header") + 
+						Pages().getTemplate("admin",auth=[True,uid],t="administrator",vars={}).replace("{[emsg]}",msg) +
+						Pages().getTemplate("footer")
+						)
+			else:
+				return self.resp(
+					Pages().getTemplate("header") + 
+					Pages().getTemplate("admin",auth=[True,uid],t="administrator",vars={}).replace("{[emsg]}","<div class='error'>Invalid request sent.</div>") +
+					Pages().getTemplate("footer")
+					)
+		else:
+			return self.resp("<script>location.href='%s';</script>"%(Main().url))
+			
+			
+	def Configure(self, request, cid=None, fid=None):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			if cid:
+				Main().execute(q="DELETE FROM pythobb_cat WHERE cid='%s'"%(cid),s=True)
+				Main().execute(q="DELETE FROM pythobb_forums WHERE parent='%s'"%(cid),s=True)
+				return self.resp("<script>location.href='%sadmin/';</script>" % (Main().url))
+			if fid:
+				Main().execute(q="DELETE FROM pythobb_forums WHERE fid='%s'"%(fid),s=True)
+				return self.resp("<script>location.href='%sadmin/';</script>" % (Main().url))
+		else:
+			return self.resp("<script>location.href='%s';</script>"%(Main().url))
+			
+	def ToggleBan(self, request, userid):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			groups = [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(userid),s=False)][0][6]
+			if not "banned" in groups.split(","):
+				Main().execute(q="UPDATE pythobb_users SET groups='banned' WHERE uid='%s'"%(userid),s=True)
+				return self.resp("<script>location.href='%sadmin/';</script>"%(Main().url))
+			else:
+				Main().execute(q="UPDATE pythobb_users SET groups='default' WHERE uid='%s'"%(userid),s=True)
+				return self.resp("<script>location.href='%sadmin/';</script>"%(Main().url))
+		else:
+			return self.resp("<script>location.href='%s';</script>"%(Main().url))
+		
+	def generateCategories(self):
+		s = ""
+		for x in [c for c in Main().execute(q="SELECT * FROM pythobb_cat",s=False)]:
+			s += "<div class='catf'><a href='javascript:;' class='"+x[1]+"'>%s</a><br/>%s</div>" % ( (x[0] + " ("+x[1]+") <a href='%sadmin/delete/category/%s/' class='modif'/>Remove</a><br/>" % (Main().url,x[1])), self.generateForums(x[1]) )
+		return s
+		
+	def generateForums(self, cid):
+		s = ""
+		for x in [c for c in Main().execute(q="SELECT * FROM pythobb_forums WHERE parent='%s'"%(cid),s=False)]:
+			s += "<div class='forum'> - " + x[0] + " <a href='%sadmin/delete/forum/%s/' class='modif'/>Remove</a></div><br/>" % (Main().url,x[1])
+		return s
+		
+	def generateMembers(self):
+		s = ""
+		for x in [c for c in Main().execute(q="SELECT * FROM pythobb_users",s=False)]:
+			if x[-1] != "1":
+				if x[-2] == "banned":
+					s += "<div class='catf'><a href='/user/"+x[0]+"/'>%s</a></div>" % ( (x[0] + " ("+x[-1]+") <a href='%sadmin/ban/user/%s/' class='modif'/>Unban</a><br/>" % (Main().url,x[-1])) )
+				else:
+					s += "<div class='catf'><a href='/user/"+x[0]+"/'>%s</a></div>" % ( (x[0] + " ("+x[-1]+") <a href='%sadmin/ban/user/%s/' class='modif'/>Ban</a><br/>" % (Main().url,x[-1])) )
+			else:
+				s += "<div class='catf'><a href='/user/"+x[0]+"/'>%s</a></div>" % ( (x[0] + " ("+x[-1]+") <br/>" ) )
+		return s
