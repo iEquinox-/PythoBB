@@ -11,9 +11,7 @@ try:
 	else:
 		indexPage = url(r'^$',f.Pages().Index,name='Index')
 except:
-	import InstallPage as i
-	xPage = url(r'^$',i.PageOut().Init,name='Init')
-	urlpatterns + ( url(r'^admin/doConfigure/',i.PageOut().doConfigure,name='doConfigure') )
+	print "Unable to open /install."
 
 urlpatterns = patterns('',
     # Examples:
@@ -34,5 +32,11 @@ urlpatterns = patterns('',
     url(r'^forum/(?P<fid>\d+)/newthread/$',f.Pages().MakeThread,name='MakeThread'),
     url(r'^forum/(?P<fid>\d+)/newthread/makeThread/$',f.Pages().ProcessNThread,name='ProcessNThread'),
     url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/$',f.Pages().Thread,name='Thread'),
-    url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/makePost/$',f.Pages().MakePost,name='MakePost')
+    url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/makePost/$',f.Pages().MakePost,name='MakePost'),
+    url(r'^admin/$',f.Pages().Administrator,name='Administrator'),
+    url(r'^admin/configure/$',f.Admin().Configure,name='Configure'),
+    url(r'^admin/configure/add/$',f.Admin().Add,name='Add'),
+    url(r'^admin/delete/category/(?P<cid>\d+)/$',f.Admin().Configure,name='Configure'),
+    url(r'^admin/delete/forum/(?P<fid>\d+)/$',f.Admin().Configure,name='Configure'),
+    url(r'^admin/ban/user/(?P<userid>\d+)/$',f.Admin().ToggleBan,name='ToggleBan')
 )
