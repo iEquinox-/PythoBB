@@ -60,3 +60,12 @@ a.minibutton {
         font-size: 10px;
         border-radius: 2px;
 }
+
+input.dark_fieldtext {
+        background: #222;
+        border: none;
+        color: #FFF;
+        padding: 10px;
+        border-radius: 3px;
+        font-family: tohama,droid sans,sans-serif;
+}
