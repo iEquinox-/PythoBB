@@ -457,11 +457,18 @@ class Pages:
 			return self.resp(self.getTemplate("header")+self.getTemplate("showthread",vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
 
 	def MakeThread(self, request, fid):
-		def genTid():
-			return str(len([c for c in Main().execute(q="SELECT * FROM pythobb_threads",s=False)]) + 1)
-		def genPid():
-			return str(len([c for c in Main().execute(q="SELECT * FROM pythobb_posts",s=False)]) + 1)
-		return self.resp("None")
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if not uid:
+			return self.resp("<script>location.href='%s';</script>"%(Main().url+"member/login/"))
+		else:
+			return self.resp(self.getTemplate("header")+self.getTemplate("makethread",auth=[True,uid]).replace("{[fid]}",fid)+self.getTemplate("footer"))
 		
 	def MakePost(self, request, fid, tid):
 		if request.COOKIES.has_key("SESSION_ID"):
@@ -482,3 +489,25 @@ class Pages:
 			username = [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][0]
 			Main().execute(q="INSERT INTO pythobb_posts VALUES ('%s','%s','%s','%s')" % (genPid(),tid,content,(username+":"+str(time.time()))),s=True)
 			return self.resp("<script>location.href='%s';</script>" % (Main().url+"forum/%s/%s/"%(fid,tid)))
+
+	def ProcessNThread(self, request, fid):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if uid:
+			import time
+			def genTid():
+				return str(len([c for c in Main().execute(q="SELECT * FROM pythobb_threads",s=False)]) + 1)
+			def genPid():
+				return str(len([c for c in Main().execute(q="SELECT * FROM pythobb_posts",s=False)]) + 1)
+			tid = genTid()
+			Main().execute("INSERT INTO pythobb_threads VALUES ('%s','%s','%s')" % (request.POST["threadname"],tid,fid),s=True)
+			Main().execute("INSERT INTO pythobb_posts VALUES ('%s','%s','%s','%s')" % (genPid(),tid,request.POST["threadcontent"],"%s:%s"%(str([p for p in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][0]),str(time.time()))),s=True)
+			return self.resp("<script>location.href='%s';</script>" % (Main().url+"forum/{0}/{1}/".format(fid,tid)))
+		else:
+			return self.resp("<script>location.href='%s';</script>" % (Main().url+"member/login/"))
