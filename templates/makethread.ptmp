@@ -1,0 +1,9 @@
+	{[userblock]}
+	<div id='container'>
+		{[getCSRF]}
+		<form action='/forum/{[fid]}/newthread/makeThread/' method='post'>
+			{[csrfToken]}
+			<input type='text' name='threadname' class='dark_fieldtext' placeholder='Thread Name'/><input type='submit' class='postbit_button' style='color:#FFF;cursor:pointer;' value='Post Thread'/><br/><br/>
+			<textarea class='fieldtext' name="threadcontent" style='height:400px;max-height:400px;width:100%;max-width:100%;'></textarea>
+	</div>
+	<div id='bottomblock'></div>
