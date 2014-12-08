@@ -1,0 +1,25 @@
+	{[userblock]}
+	<script>
+		jQuery(document).ready(function(){
+			jQuery("div.catf > a").on("click",function(){
+				jQuery("input[name='add_catname']").val(jQuery(this).attr('class')+"}");
+			});
+		});
+	</script>
+	<div id='container'>
+		<style>div#left,div#right {width:45%;color:#FFF;font-family:tohama,droid sans,sans-serif;padding:3px;}div#right{float:right;}a.modif{float:right;background:#ee3535;padding:2px;border-radius:2px;margin-top:-2px;}div.catf {background:#222;padding:10px;}div.success,div.error {padding: 10px;border-radius: 3px;text-align: center;color: #FFF;font-family: tohama,droid sans,sans-serif;margin: 0 0 10px;}div.success {background: #2ecc71;} div.error {background:#EE3535;}</style>
+		{[emsg]}
+		<div id='right'>
+			{[members]}
+		</div>
+		<div id='left'>
+			{[getCSRF]}
+			<form action='/admin/configure/add/' method='post'>
+				{[csrfToken]}
+				{[categories]}<br/>
+				<input type='text' class='dark_fieldtext' name='add_catname' placeholder='Category Name' style='width:90%;'/>
+				<input type='submit' class='dark_fieldtext' value='+' style='width:8%;float:right;'/><br/>
+			</form>
+		</div>
+	</div>
+	<div id='bottomblock'></div>
