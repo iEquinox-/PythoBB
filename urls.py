@@ -31,5 +31,7 @@ urlpatterns = patterns('',
     url(r'^lostcsrf/doToken/$',f.Pages().doToken,name='doToken'),
     url(r'^forum/(?P<fid>\d+)/$',f.Pages().Forum,name='Forum'),
     url(r'^forum/(?P<fid>\d+)/newthread/$',f.Pages().MakeThread,name='MakeThread'),
-    url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/$',f.Pages().Thread,name='Thread')
+    url(r'^forum/(?P<fid>\d+)/newthread/makeThread/$',f.Pages().ProcessNThread,name='ProcessNThread'),
+    url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/$',f.Pages().Thread,name='Thread'),
+    url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/makePost/$',f.Pages().MakePost,name='MakePost')
 )
