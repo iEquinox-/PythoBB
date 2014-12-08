@@ -397,10 +397,7 @@ class Pages:
 	def doToken(self, request): # If CSRF token is lost
 		from django.middleware.csrf import rotate_token
 		rotate_token(request)
-		o = request.GET["rel"]
-		if not o:
-			o = Main().url
-		return self.resp("<script>location.href='%s';</script>" % (o))
+		return self.resp("<script>location.href='%s';</script>" % (Main().url))
 		
 	def userCP(self, request):
 		if request.COOKIES.has_key("SESSION_ID"):
