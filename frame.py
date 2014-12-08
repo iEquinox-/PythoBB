@@ -164,16 +164,14 @@ class Forums:
 			s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Lastpost by "+last.split(":")[0]) )
 		return s
 		
-	def genPosts(self, array, fid, tid, loggedin):
+	def genPosts(self, _uid_, array, fid, tid, loggedin):
 		if loggedin == False: makepost = open(Main().dir+"templates/nopost.ptmp","r").read()
-		if loggedin == True: makepost = open(Main().dir+"templates/makepost.ptmp","r").read()
+		if loggedin == True: makepost = str(open(Main().dir+"templates/makepost.ptmp","r").read()).replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""").replace("{[fid]}",fid).replace("{[tid]}",tid)
 		temp = open(Main().dir+"templates/posts.ptmp","r").read()
-		s = ""
-		for x in array:
-			s += str( temp.replace("{[fname]}",[t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE tid='%s'"%(tid),s=False)][0][0] ) )
-		return s.replace("{[getCSRF]}","<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>").replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""").replace("{[showposts]}",self.generatePosts(fid,tid)).replace("{[fid]}",fid).replace("{[tid]}",tid).replace("{[makepost]}",makepost)
+		s = str( temp.replace("{[fname]}",[t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE tid='%s'"%(tid),s=False)][0][0] ) )
+		return s.replace("{[getCSRF]}","<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>").replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""").replace("{[showposts]}",self.generatePosts(_uid_,fid,tid)).replace("{[fid]}",fid).replace("{[tid]}",tid).replace("{[makepost]}",makepost)
 		
-	def generatePosts(self, fid, tid):
+	def generatePosts(self, uid, fid, tid):
 		temp = open(Main().dir+"templates/post.ptmp","r").read()
 		p = 0
 		s = ""
@@ -181,11 +179,27 @@ class Forums:
 		for x in array:
 			p += 1
 			usr = x[-1].split(":")[0]
+			if uid != None:
+				if str(uid) == str([c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(usr),s=False)][0][-1]):
+					delButton = """<a href='javascript:;' class='minibutton delete' style='float:right;margin-top:-5px;' pid='{[postid]}'>Delete</a>""" 
+				else:
+					delButton = ""
 			av = [v for v in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(usr),s=False)][0][4]
-			s += temp.replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}",x[2]).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
+			s += temp.replace("{[deletepost]}",delButton).replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}", BBCode().Check(x[2]) ).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
 		return s
 		
-
+class BBCode:
+	def __init__(self):
+		import re,types
+		self.modules = [re,types]
+		
+	def Check(self, content):
+		# Checking for BBCode
+		quote = self.modules[0].findall('\[quote="(.*?)"\](.*?)\[/quote\]',content)
+		if len(quote) != 0:
+			content = content.replace(quote.group(), "shit")
+		return content
+			
 class Pages:
 	def __init__(self):
 		from django.http import HttpResponse
@@ -220,7 +234,7 @@ class Pages:
 		elif(vars != None)and(t=="showthread"):
 			u = {
 				"newpost":Main().url+"forum/{0}/{1}/#newpost".format(vars["fid"],vars["tid"]),
-				"posts":Forums().genPosts(array=[c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%vars["tid"],s=False)],fid=vars["fid"],tid=vars["tid"],loggedin=auth[0])
+				"posts":Forums().genPosts(_uid_=auth[1],array=[c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%vars["tid"],s=False)],fid=vars["fid"],tid=vars["tid"],loggedin=auth[0])
 				}
 		else:
 			u = dict()
@@ -441,4 +455,28 @@ class Pages:
 			return self.resp(self.getTemplate("header")+self.getTemplate("showthread",vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
 
 	def MakeThread(self, request, fid):
+		def genTid():
+			return str(len([c for c in Main().execute(q="SELECT * FROM pythobb_threads",s=False)]) + 1)
+		def genPid():
+			return str(len([c for c in Main().execute(q="SELECT * FROM pythobb_posts",s=False)]) + 1)
 		return self.resp("None")
+		
+	def MakePost(self, request, fid, tid):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if not uid:
+			return self.resp("<script>location.href='%s';</script>" % (Main().url))
+		else:
+			def genPid():
+				return str(len([c for c in Main().execute(q="SELECT * FROM pythobb_posts",s=False)]) + 1)
+			import time
+			content = request.POST["postContent"]
+			username = [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][0]
+			Main().execute(q="INSERT INTO pythobb_posts VALUES ('%s','%s','%s','%s')" % (genPid(),tid,content,(username+":"+str(time.time()))),s=True)
+			return self.resp("<script>location.href='%s';</script>" % (Main().url+"forum/%s/%s/"%(fid,tid)))
