@@ -1,7 +1,7 @@
 		{[getCSRF]}
 		<script>
 			jQuery(document).ready(function(){
-				var pid = 0, text = "";
+				var pid = 0, txt = "";
 				jQuery("a.minibutton.quote").on("click",function(){
 					pid = jQuery(this).attr('pid');
 					pre = jQuery("form>textarea").text()
