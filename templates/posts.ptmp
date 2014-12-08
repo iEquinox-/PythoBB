@@ -5,7 +5,7 @@
 				jQuery("a.minibutton.quote").on("click",function(){
 					pid = jQuery(this).attr('pid');
 					text = jQuery("div#post>div.post>span").text()
-					jQuery("form>textarea").text("[quote=\""+pid+"\"]\n"+text+"\n[/quote]")
+					jQuery("form>textarea").text(jQuery("form>textarea").text() + "[quote=\""+pid+"\"]\n"+text+"\n[/quote]\n\n");
 				});
 			});
 		</script>
@@ -14,13 +14,7 @@
 				<div id='thread'>
 					{[showposts]}<br/>
 					<a name='newpost'></a>
-					<div id='makepost'>
-						<form action='/forum/{[fid]}/{[tid]}/makePost/' method='post'>
-							{[csrfToken]}
-							<textarea style='height: 200px;width: 100%;max-height: 200px;max-width: 100%;' name='postContent' class='fieldtext'></textarea>
-							<input type='submit' class='postbit_button' value='Post' style='color:#FFF;margin-top:-36px;margin-right:1px;border-radius:2px 0 2px 0;position:relative;cursor:pointer;'/>
-						</form>
-					</div>
+					{[makepost]}
 				</div>
 			</div>
 		<div class='fbot'></div>
