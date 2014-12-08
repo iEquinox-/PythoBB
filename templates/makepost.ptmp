@@ -1,0 +1,7 @@
+					<div id='makepost'>
+						<form action='/forum/{[fid]}/{[tid]}/makePost/' method='post'>
+							{[csrfToken]}
+							<textarea style='height: 200px;width: 100%;max-height: 200px;max-width: 100%;' name='postContent' class='fieldtext'></textarea>
+							<input type='submit' class='postbit_button' value='Post' style='color:#FFF;margin-top:-36px;margin-right:1px;border-radius:2px 0 2px 0;position:relative;cursor:pointer;'/>
+						</form>
+					</div>
