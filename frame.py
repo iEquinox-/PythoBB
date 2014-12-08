@@ -184,6 +184,8 @@ class Forums:
 					delButton = """<a href='javascript:;' class='minibutton delete' style='float:right;margin-top:-5px;' pid='{[postid]}'>Delete</a>""" 
 				else:
 					delButton = ""
+			else:
+				delButton = ""
 			av = [v for v in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(usr),s=False)][0][4]
 			s += temp.replace("{[deletepost]}",delButton).replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}", BBCode().Check(x[2]) ).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
 		return s
