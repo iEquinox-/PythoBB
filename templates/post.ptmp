@@ -1,0 +1,13 @@
+	<a name='pid{[postid]}'></a>
+	<div class='infuser'>
+		<a href='/user/{[username]}/'>{[username]}</a>
+		<span style='float:right;'><a href='{[permlink]}'>#{[postnum]}</a></span>
+	</div>
+	<div id='post' class='{[postid]}'>
+		<div class='inf' style='padding:10px 0;width:15%;float:left;margin:0 auto 5px;text-align:center;'>{[uservatar]}</div>
+		<div class='post' style='width:83%;float:right;border-radius:3px;'>
+			<span>{[content]}</span>
+			<div class='hr' style='margin:5px 0 10px;'></div>
+			<a href='javascript:;' class='minibutton quote' pid='{[postid]}'>Quote</a>
+		</div>
+	</div>
