@@ -25,7 +25,7 @@ function doCSRF() {
 		if(csrftoken != null){
 			$("input.CSRFToken").attr('value',csrftoken);
 		} else {
-			location.href = "/doToken/?rel="+document.url;
+			location.href = "lostcsrf/doToken/";
 		}
 	});
 }
