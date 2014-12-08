@@ -11,6 +11,7 @@ try:
 	else:
 		indexPage = url(r'^$',f.Pages().Index,name='Index')
 except:
+	import InstallPage as i
 	xPage = url(r'^$',i.PageOut().Init,name='Init')
 	urlpatterns + ( url(r'^admin/doConfigure/',i.PageOut().doConfigure,name='doConfigure') )
 
