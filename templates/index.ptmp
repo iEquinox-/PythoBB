@@ -1,4 +1,7 @@
 	{[userblock]}
 	<div id='container'>
-		PythoBB
+		<div id='forums'>
+			{[category]}
+		</div>
 	</div>
+	<div id='bottomblock'></div>
