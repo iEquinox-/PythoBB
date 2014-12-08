@@ -4,8 +4,9 @@
 				var pid = 0, text = "";
 				jQuery("a.minibutton.quote").on("click",function(){
 					pid = jQuery(this).attr('pid');
-					text = jQuery("div#post>div.post>span").text()
-					jQuery("form>textarea").text(jQuery("form>textarea").text() + "[quote=\""+pid+"\"]\n"+text+"\n[/quote]\n\n");
+					pre = jQuery("form>textarea").text()
+					txt = jQuery("div#post."+pid+">table>tbody>tr>td>div.post>span").text()
+					jQuery("form>textarea").text( pre + "[quote=\""+pid+"\"]\n"+txt+"\n[/quote]\n\n" )
 				});
 			});
 		</script>
