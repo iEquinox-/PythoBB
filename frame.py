@@ -344,14 +344,16 @@ class Pages:
 		r = User().authorize(inp=[u,p])
 		if r[0] == "Mismatched password.":
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("login").replace("<div class='title login'>Login</div>","<div class='title login' style='background:#EE3535;'>Login</div>"),self.getTemplate("footer"))
+			sx = self.resp(s)
 		if r[0] == "Invalid username.":
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("login").replace("<div class='title login'>Login</div>","<div class='title login' style='background:#EE3535;'>Login</div>"),self.getTemplate("footer"))
+			sx = self.resp(s)
 		if r[0] == "Login successful.":
 			s = "%s%s%s" % (self.getTemplate("header"),self.getTemplate("successfullogin"),self.getTemplate("footer"))
 			#Main().execute(q="UPDATE pythobb_users SET loggedin='1' WHERE uid='%s'" % (r[1]),s=True)
 			sid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE uid='%s'" % (r[1]),s=False)][0][0]
-		sx = self.resp(s)
-		sx.set_cookie('SESSION_ID',sid)
+			sx = self.resp(s)
+			sx.set_cookie('SESSION_ID',sid)
 		return sx
 
 	def doRegister(self, request):
