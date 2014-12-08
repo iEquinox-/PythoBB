@@ -164,12 +164,14 @@ class Forums:
 			s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Lastpost by "+last.split(":")[0]) )
 		return s
 		
-	def genPosts(self, array, fid, tid):
+	def genPosts(self, array, fid, tid, loggedin):
+		if loggedin == False: makepost = open(Main().dir+"templates/nopost.ptmp","r").read()
+		if loggedin == True: makepost = open(Main().dir+"templates/makepost.ptmp","r").read()
 		temp = open(Main().dir+"templates/posts.ptmp","r").read()
 		s = ""
 		for x in array:
 			s += str( temp.replace("{[fname]}",[t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE tid='%s'"%(tid),s=False)][0][0] ) )
-		return s.replace("{[getCSRF]}","<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>").replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""").replace("{[showposts]}",self.generatePosts(fid,tid)).replace("{[fid]}",fid).replace("{[tid]}",tid)
+		return s.replace("{[getCSRF]}","<script>"+open(Main().dir + "templates/js/function.js","r").read()+"doCSRF();</script>").replace("{[csrfToken]}","""<input type="hidden" name="csrfmiddlewaretoken" class="CSRFToken" value="None">""").replace("{[showposts]}",self.generatePosts(fid,tid)).replace("{[fid]}",fid).replace("{[tid]}",tid).replace("{[makepost]}",makepost)
 		
 	def generatePosts(self, fid, tid):
 		temp = open(Main().dir+"templates/post.ptmp","r").read()
@@ -218,7 +220,7 @@ class Pages:
 		elif(vars != None)and(t=="showthread"):
 			u = {
 				"newpost":Main().url+"forum/{0}/{1}/#newpost".format(vars["fid"],vars["tid"]),
-				"posts":Forums().genPosts(array=[c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%vars["tid"],s=False)],fid=vars["fid"],tid=vars["tid"])
+				"posts":Forums().genPosts(array=[c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%vars["tid"],s=False)],fid=vars["fid"],tid=vars["tid"],loggedin=auth[0])
 				}
 		else:
 			u = dict()
