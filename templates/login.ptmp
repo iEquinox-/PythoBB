@@ -3,7 +3,7 @@
 	<div id='minicontainer'>
 		<form action='/member/login/doLogin/' method='post' class='loginmethod'>
 			{[csrfToken]}
-			<input type='text' name='username' maxlength='25' class='fieldtext' placeholder='Username/Email'/><br/>
+			<input type='text' name='username' maxlength='25' class='fieldtext' placeholder='Username'/><br/>
 			<input type='password' name='password' maxlength='25' class='fieldtext' placeholder='Password'/> <input type='submit' value='Login' class='fieldtext r'/>
 		</form>
 	</div>
