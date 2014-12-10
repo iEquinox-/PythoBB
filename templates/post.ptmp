@@ -11,9 +11,9 @@
 						<td style='vertical-align:top;'>
 							<div class='inf' style='padding:10px 0;width:15%;float:left;margin:0 auto 5px;text-align:center;'>{[uservatar]}</div>
 						</td>
-						<td style='width:100%;vertical-align:top;'>
+						<td style='width:100%;vertical-align:top;max-width:100;'>
 							<div class='post' style='border-radius:3px;margin-right:-3px;'>
-								<span>{[content]}</span>
+								<span style='word-wrap:break-word;'>{[content]}</span>
 								<div class='hr' style='margin:5px 0 10px;'></div>
 								{[deletepost]}
 								<a href='javascript:;' class='minibutton quote' pid='{[postid]}'>Quote</a>
