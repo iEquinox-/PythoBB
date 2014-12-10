@@ -140,7 +140,7 @@ class Forums:
 	def getAmount(self, o, fid):
 		if o == "p":
 			v = 0
-			threads = [t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(fid),s=False)] # Get threads for counting posts
+			threads = [t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(fid),s=False)]
 			for x in threads:
 				tid = x[1]
 				v += len([c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%(tid),s=False)])
@@ -157,6 +157,7 @@ class Forums:
 		
 	def genCat(self, array):
 		temp = open(Main().dir+"templates/category.ptmp","r").read()
+		temp = open(Main().dir+"templates/category.ptmp","r").read()
 		s = ""
 		for x in array:
 			cid = x[1]
@@ -167,8 +168,9 @@ class Forums:
 		temp = open(Main().dir+"templates/thread.ptmp","r").read()
 		s = ""
 		for x in array:
-			last = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % (x[2]),s=False)][-1][-1]
-			s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Lastpost by "+last.split(":")[0]) )
+			last = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % (x[1]),s=False)][-1][-1]
+			s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Last post by "+last.split(":")[0]) )
+			last = ""
 		return s
 		
 	def genPosts(self, _uid_, array, fid, tid, loggedin):
@@ -259,7 +261,7 @@ class Pages:
 			if [x for x in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(a2),s=False)][0][-2] == "banned":
 				x = {"forumurl":"","username":usr,"admincp":"","logout":"","usercp":""}
 			else:	
-				x = {"forumurl":Main().url,"username":usr,"admincp":acp,"logout":"<li style='float:right;'><a href='{[forumurl]}member/logout/'>Logout</a></li>","usercp":"<li><a href='{[forumurl]}member/controlpanel/'>User CP</a></li>"}
+				x = {"forumurl":Main().url,"username":usr,"admincp":acp,"logout":"<li style='float:right;'><a href='{[forumurl]}member/logout/'>Logout</a></li>","usercp":"<li><a href='/member/controlpanel/'>User CP</a></li>"}
 			for c in re.findall("\{\[(.*?)\]\}",s):
 				s = s.replace( "{[%s]}"%(c), x[c] )
 			return s
@@ -397,7 +399,10 @@ class Pages:
 	def doToken(self, request): # If CSRF token is lost
 		from django.middleware.csrf import rotate_token
 		rotate_token(request)
-		return self.resp("<script>location.href='%s';</script>" % (Main().url))
+		o = request.GET["rel"]
+		if not o:
+			o = Main().url
+		return self.resp("<script>location.href='%s';</script>" % (o))
 		
 	def userCP(self, request):
 		if request.COOKIES.has_key("SESSION_ID"):
@@ -423,17 +428,20 @@ class Pages:
 		else:
 			uid = None
 		if uid:
+			import re
 			if(request.POST["avatar"])and(request.POST["avatar"] != ""):
 				try:
 					r = request.POST["avatar"]
-					allowed = [".gif",".png",".jpg"]
-					if not "."+str(r)[::-1][0:3][::-1] in allowed:
+					rava = re.findall("(.*?)\.(png|PNG|gif|GIF|jpg|JPG)",r)
+					if len(rava) == 0:
 						return
 					else:
+						if len(rava) >= 1:
+							rava = rava[0]
 						Main().execute(q="UPDATE pythobb_users SET avatar='%s' WHERE uid='%s'" % (r,uid),s=True)
 						return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Your settings have been successfully updated.</div>"),self.getTemplate("footer")))
 				except Exception as e:
-					return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Error, try again. If the problem persists, contain the site admin.</div>"),self.getTemplate("footer")))
+					return self.resp("%s%s%s" % (self.getTemplate("header"),self.getTemplate("controlpanel",auth=[True,uid]).replace("<div id='container'>","<div id='container'><div class='msg'>Error, try again. If the problem persists, contact the site admin.</div>"),self.getTemplate("footer")))
 			if(request.POST["usertitle"])and(request.POST["usertitle"] != ""):
 				try:
 					Main().execute(q="UPDATE pythobb_users SET usertitle='%s' WHERE uid='%s'" % (request.POST["usertitle"],uid),s=True)
