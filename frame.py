@@ -146,7 +146,13 @@ class Forums:
 				v += len([c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%(tid),s=False)])
 			return str(v)
 		if o == "t":
-			return str(len([t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(fid),s=False)]))
+			s = 0
+			t = [t for t in Main().execute(q="SELECT * FROM pythobb_threads WHERE parent='%s'"%(fid),s=False)]
+			for p in t:
+				x = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % p[1],s=False)]
+				if len(x) == 0:
+					s += 1
+			return str(int(len(t) - s))
 		
 	def genFor(self, array):
 		temp = open(Main().dir+"templates/forum.ptmp","r").read()
@@ -168,9 +174,10 @@ class Forums:
 		temp = open(Main().dir+"templates/thread.ptmp","r").read()
 		s = ""
 		for x in array:
-			last = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % (x[1]),s=False)][-1][-1]
-			s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Last post by "+last.split(":")[0]) )
-			last = ""
+			if len([p for p in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'"%(x[1]),s=False)]) > 0:
+				last = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % (x[1]),s=False)][-1][-1]
+				s += str( temp.replace("{[threadname]}",x[0]).replace("{[threadurl]}",Main().url+"forum/{0}/{1}/".format(x[2],x[1])).replace("{[lastpost]}", "Last post by "+last.split(":")[0]) )
+				last = ""
 		return s
 		
 	def genPosts(self, _uid_, array, fid, tid, loggedin):
@@ -190,13 +197,16 @@ class Forums:
 			usr = x[-1].split(":")[0]
 			if uid != None:
 				if str(uid) == str([c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(usr),s=False)][0][-1]):
-					delButton = """<a href='javascript:;' class='minibutton delete' style='float:right;margin-top:-5px;' pid='{[postid]}'>Delete</a>""" 
+					delButton = """<a href='%sforum/%s/%s/deletePost/{[postid]}/' class='minibutton delete' style='float:right;margin-top:-5px;'>Delete</a>""" % (Main().url,fid,tid)
 				else:
-					delButton = ""
+					if [q for q in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][-2] == "admin":
+						delButton = """<a href='%sforum/%s/%s/deletePost/{[postid]}/' class='minibutton delete' style='float:right;margin-top:-5px;'>Delete</a>""" % (Main().url,fid,tid)
+					else:
+						delButton = ""
 			else:
 				delButton = ""
 			av = [v for v in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'"%(usr),s=False)][0][4]
-			s += temp.replace("{[deletepost]}",delButton).replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}", x[2] ).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
+			s += temp.replace("{[deletepost]}",delButton).replace("{[username]}",usr).replace("{[postid]}",x[0]).replace("{[uservatar]}","<img src='%s' class='profava'/>"%(av)).replace("{[content]}", BBCode().Parse(x[2]) ).replace("{[postnum]}",str(p)).replace("{[permlink]}",Main().url+"forum/{0}/{1}/#{2}".format(fid,tid,x[0]))
 		return s
 			
 class Pages:
@@ -481,9 +491,15 @@ class Pages:
 			if User().Check(uid) == 0:
 				return self.resp(self.getTemplate("header")+self.getTemplate("banned",vars={},t="cats",auth=[True,uid])+self.getTemplate("footer"))
 			else:
-				return self.resp(self.getTemplate("header")+self.getTemplate("showthread",auth=[True,uid],vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
+				if len([c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % (tid),s=False)]) == 0:
+					return self.resp(self.getTemplate("header")+self.getTemplate("showthread",auth=[True,uid]).replace("<a href='{[newpost]}' class='postbit_button'>New Post</a>","").replace("<br/><br/><br/>","").replace("{[posts]}","<div style='text-align:center;color:#FFF;background:#222;padding:10px;border-radius:3px;font-family:tohama,droid sans,sans-serif;'>Invalid thread.</div>")+self.getTemplate("footer"))
+				else:
+					return self.resp(self.getTemplate("header")+self.getTemplate("showthread",auth=[True,uid],vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
 		else:
-			return self.resp(self.getTemplate("header")+self.getTemplate("showthread",vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
+			if len([c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE parent='%s'" % (tid),s=False)]) == 0:
+				return self.resp(self.getTemplate("header")+self.getTemplate("showthread").replace("<a href='{[newpost]}' class='postbit_button'>New Post</a>","").replace("<br/><br/><br/>","").replace("{[posts]}","<div style='text-align:center;color:#FFF;background:#222;padding:10px;border-radius:3px;font-family:tohama,droid sans,sans-serif;'>Invalid thread.</div>")+self.getTemplate("footer"))
+			else:
+				return self.resp(self.getTemplate("header")+self.getTemplate("showthread",vars={"fid":fid,"tid":tid},t="showthread")+self.getTemplate("footer"))
 
 	def MakeThread(self, request, fid):
 		if request.COOKIES.has_key("SESSION_ID"):
@@ -521,6 +537,31 @@ class Pages:
 			username = [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][0]
 			Main().execute(q="INSERT INTO pythobb_posts VALUES ('%s','%s','%s','%s')" % (genPid(),tid,content,(username+":"+str(time.time()))),s=True)
 			return self.resp("<script>location.href='%s';</script>" % (Main().url+"forum/%s/%s/"%(fid,tid)))
+			
+	def DeletePost(self, request, fid, tid, pid):
+		if request.COOKIES.has_key("SESSION_ID"):
+			sessionID = request.COOKIES["SESSION_ID"]
+			if(len(sessionID)>0):
+				uid = [x for x in Main().execute(q="SELECT * FROM pythobb_sessions WHERE sessionid='%s'" % (sessionID),s=False)][0][-1]
+			else:
+				uid = None
+		else:
+			uid = None
+		if not uid:
+			return self.resp("<script>location.href='%s';</script>" % (Main().url))
+		else:
+			x = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE pid='%s'" % (pid),s=False)]
+			username = x[0][-1].split(":")[0]
+			uuid = [c for c in Main().execute(q="SELECT * FROM pythobb_users WHERE username='%s'" % (username),s=False)]
+			if uid == uuid[0][-1]:
+				Main().execute(q="UPDATE pythobb_posts SET parent='' WHERE pid='%s'"%(pid),s=True)
+				return self.resp("<script>location.href='%sforum/%s/%s/';</script>" % (Main().url,fid,tid ))
+			else:
+				if [p for p in Main().execute(q="SELECT * FROM pythobb_users WHERE uid='%s'"%(uid),s=False)][0][-2] != "admin":
+					return self.resp("<script>location.href='%sforum/%s/%s/#%s';</script>" % (Main().url,fid,tid,pid ))
+				else:
+					Main().execute(q="UPDATE pythobb_posts SET parent='' WHERE pid='%s'"%(pid),s=True)
+					return self.resp("<script>location.href='%sforum/%s/%s/';</script>" % (Main().url,fid,tid ))
 
 	def ProcessNThread(self, request, fid):
 		if request.COOKIES.has_key("SESSION_ID"):
@@ -678,3 +719,23 @@ class Admin:
 			else:
 				s += "<div class='catf'><a href='/user/"+x[0]+"/'>%s</a></div>" % ( (x[0] + " ("+x[-1]+") <br/>" ) )
 		return s
+
+class BBCode():
+	# BBCode Parser
+	def __init__(self):
+		import re
+		self.modules = [re]
+		
+	def Parse(self, content):
+		q = self.modules[0].findall("\[(quote)=\"(\d+)\"\]",content,self.modules[0].IGNORECASE)
+		if len(q) == 0:
+			return content
+		else:
+			pid = q[0][1]
+			post = [c for c in Main().execute(q="SELECT * FROM pythobb_posts WHERE pid='%s'"%(pid),s=False)]
+			if len(post) == 0:
+				return content.replace("[%s=\"%s\"]" % (q[0][0],q[0][1]), "")
+			else:
+				user = post[0][-1].split(":")[0]
+				text = post[0][-2]
+				return content.replace("[%s=\"%s\"]" % (q[0][0],q[0][1]), self.Parse("<div class='quoteblock'><div class='cite'>%s wrote:</div><div class='quote'>%s</div></div>" % (user, text)))
