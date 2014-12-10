@@ -74,6 +74,7 @@ div.quoteblock {
         background: #333;
         padding: 5px 10px;
         border-radius: 3px;
+        margin-bottom: 10px;
 }
 
 div.quoteblock > div.cite {
