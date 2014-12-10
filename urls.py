@@ -11,13 +11,10 @@ try:
 	else:
 		indexPage = url(r'^$',f.Pages().Index,name='Index')
 except:
-	print "Unable to open /install."
+	xPage = url(r'^$',i.PageOut().Init,name='Init')
+	urlpatterns + ( url(r'^admin/doConfigure/',i.PageOut().doConfigure,name='doConfigure') )
 
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'pythobb.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-    # url(r'^admin/', include(admin.site.urls)),
     indexPage,
     url(r'^user/(?P<username>\w+)/$',f.Pages().Profile,name='Profile'),
     url(r'^member/controlpanel/$',f.Pages().userCP,name='userCP'),
@@ -33,6 +30,7 @@ urlpatterns = patterns('',
     url(r'^forum/(?P<fid>\d+)/newthread/makeThread/$',f.Pages().ProcessNThread,name='ProcessNThread'),
     url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/$',f.Pages().Thread,name='Thread'),
     url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/makePost/$',f.Pages().MakePost,name='MakePost'),
+    url(r'^forum/(?P<fid>\d+)/(?P<tid>\d+)/deletePost/(?P<pid>\d+)/$',f.Pages().DeletePost,name='DeletePost'),
     url(r'^admin/$',f.Pages().Administrator,name='Administrator'),
     url(r'^admin/configure/$',f.Admin().Configure,name='Configure'),
     url(r'^admin/configure/add/$',f.Admin().Add,name='Add'),
